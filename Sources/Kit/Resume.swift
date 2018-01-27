@@ -6,9 +6,18 @@ extension State {
     
     static func resume() -> State {
         return State(
-            markers: resumeMarkers(),
+            markers: resumeFakeMarkers(),
             error: nil
         )
+    }
+
+    static func resumeFakeMarkers() -> [UUID: Marker] {
+        var out = [UUID: Marker]()
+        for _ in 0..<30 {
+            let marker = Marker("Lorem ipsum", color: 0x000000)
+            out[marker.id] = marker
+        }
+        return out
     }
 
     static func resumeMarkers() -> [UUID: Marker] {

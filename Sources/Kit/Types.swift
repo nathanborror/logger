@@ -14,7 +14,12 @@ public struct Marker: Codable {
     public var error: KitError?
 }
 
-extension Marker: Equatable {
+extension Marker: Equatable, Hashable {
+
+    public var hashValue: Int {
+        return id.hashValue
+    }
+
     public static func ==(lhs: Marker, rhs: Marker) -> Bool {
         return lhs.id == rhs.id &&
             lhs.text == rhs.text &&

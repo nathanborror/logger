@@ -5,6 +5,7 @@ class MarkersVC: UITableViewController {
 
     private var model = MarkersModel()
     private var composer = Composer()
+    private var shouldScrollToBottom = true
 
     override var inputAccessoryView: UIView? {
         return composer
@@ -30,16 +31,29 @@ class MarkersVC: UITableViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         becomeFirstResponder()
+        scrollToBottom(animated: false)
+        shouldScrollToBottom = false
     }
 
     func appUpdate(state: State) {
+        let priorMarkers = model.markers
         if model.applyMarkers(state) {
-            tableView.reloadData()
+            tableView.apply(old: priorMarkers, new: model.markers, section: 0, animation: UITableViewRowAnimation.none)
+            scrollToBottom(animated: true)
         }
     }
 
+    func scrollToBottom(animated: Bool) {
+        guard shouldScrollToBottom else { return }
+        let indexPath = IndexPath(row: model.markers.count - 1, section: 0)
+        tableView.scrollToRow(at: indexPath, at: .bottom, animated: animated)
+    }
+
     @objc func handleSendHit(_ sender: Composer) {
-        Kit.insert(marker: sender.textView.text)
+        guard let text = sender.text else { return }
+        shouldScrollToBottom = true
+        Kit.insert(marker: text)
+        sender.clear()
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -50,7 +64,7 @@ class MarkersVC: UITableViewController {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "MarkerCell", for: indexPath) as? MarkerCell else {
             fatalError("Unknown cell")
         }
-        let marker = model.markers[indexPath.section]
+        let marker = model.markers[indexPath.row]
         cell.configure(with: marker)
         return cell
     }
@@ -64,7 +78,7 @@ struct MarkersModel {
     var markers: [Marker] = []
 
     mutating func applyMarkers(_ state: State) -> Bool {
-        let stateMarkers = Array(state.markers.values).sorted { $0.created > $1.created }
+        let stateMarkers = Array(state.markers.values).sorted { $0.created < $1.created }
         guard markers != stateMarkers else { return false }
         self.markers = stateMarkers
         return true

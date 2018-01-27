@@ -18,6 +18,7 @@ class MarkerCell: UITableViewCell {
     }()
 
     func configure(with marker: Marker) {
+        self.selectionStyle = .none
         self.identifier = marker.id
         self.markerLabel.text = marker.text
         self.contentView.backgroundColor = .black
