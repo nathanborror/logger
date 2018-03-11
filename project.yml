@@ -1,76 +1,9 @@
-
-name: Markers
-settings: 
-  PRODUCT_BUNDLE_IDENTIFIER: run.nathan.$(PRODUCT_NAME)
-  DEVELOPMENT_TEAM: 294VZ3T33E
-settingGroups:
-  versionPreset:
-    IPHONEOS_DEPLOYMENT_TARGET: 11.0
+name: Logger
 options:
-  createIntermediateGroups: true
-
-targets:
-  Markers:
-    type: application
-    platform: iOS
-    sources: Sources/Markers
-    scheme:
-      testTargets:
-      - KitTests
-      - UITests
-      - Tests
-    dependencies:
-    - target: Kit
-    settings:
-      groups:
-      - versionPreset
-    postbuildScripts:
-    - path: Scripts/increment-build.sh
-      name: Increment Build
-      runOnlyWhenInstalling: true
-  
-  # Frameworks
-
-  Kit:
-    type: framework
-    platform: iOS
-    sources: 
-    - path: Sources/Kit
-    scheme:
-      testTargets:
-      - KitTests
-    settings:
-      groups:
-      - versionPreset
-
-  # Tests
-
-  Tests:
-    type: bundle.unit-test
-    platform: iOS
-    sources: Tests/Tests
-    dependencies:
-    - target: Markers
-    settings:
-      groups:
-      - versionPreset
-  
-  UITests:
-    type: bundle.ui-testing
-    platform: iOS
-    sources: Tests/UITests
-    dependencies:
-    - target: Markers
-    settings:
-      groups:
-      - versionPreset
-
-  KitTests:
-    type: bundle.unit-test
-    platform: iOS
-    sources: Tests/KitTests
-    dependencies:
-    - target: Kit
-    settings:
-      groups:
-      - versionPreset
+  bundleIdPrefix: run.nathan
+  xcodeVersion: 9.2
+include:
+  - Logger-iOS/project.yml
+  - LoggerKit/project.yml
+  - SQLite/project.yml
+  - Differ/project.yml

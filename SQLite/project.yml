@@ -1,0 +1,25 @@
+fileGroups:
+  - SQLite
+targets:
+  SQLite:
+    type: framework
+    platform: iOS
+    sources: 
+     - SQLite/Sources
+    settings:
+      INFOPLIST_FILE: SQLite/Support/Info.plist
+      IPHONEOS_DEPLOYMENT_TARGET: 11.0
+    scheme:
+      testTargets:
+        - SQLiteTests
+  
+  SQLiteTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: 
+      - SQLite/Tests
+    settings:
+      INFOPLIST_FILE: SQLite/Support/Tests-Info.plist
+      IPHONEOS_DEPLOYMENT_TARGET: 11.0
+    dependencies:
+      - target: SQLite

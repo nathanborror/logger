@@ -1,0 +1,11 @@
+fileGroups:
+  - Differ
+targets:
+  Differ:
+    type: framework
+    platform: iOS
+    sources: 
+     - Differ/Sources
+    settings:
+      INFOPLIST_FILE: Differ/Support/Info.plist
+      IPHONEOS_DEPLOYMENT_TARGET: 11.0
