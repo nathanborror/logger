@@ -1,11 +1,11 @@
 fileGroups:
-  - Differ
+- Vendor/Attributed
 targets:
-  Differ:
+  Attributed:
     type: framework
     platform: iOS
     sources: 
-     - Differ/Sources
+    - Vendor/Attributed/Sources
     settings:
-      INFOPLIST_FILE: Differ/Support/Info.plist
+      INFOPLIST_FILE: Vendor/Attributed/Support/Info.plist
       IPHONEOS_DEPLOYMENT_TARGET: 11.0

@@ -1,27 +1,27 @@
 fileGroups:
-  - LoggerKit
+- LoggerKit
 targets:
   LoggerKit:
     type: framework
     platform: iOS
     sources: 
-      - LoggerKit/Sources
+    - LoggerKit/Sources
     settings:
       INFOPLIST_FILE: LoggerKit/Support/Info.plist
       IPHONEOS_DEPLOYMENT_TARGET: 11.0
     scheme:
       testTargets:
-        - LoggerKitTests
+      - LoggerKitTests
     dependencies:
-      - target: SQLite
+    - target: SQLite
 
   LoggerKitTests:
     type: bundle.unit-test
     platform: iOS
     sources: 
-      - LoggerKit/Tests
+    - LoggerKit/Tests
     settings:
       INFOPLIST_FILE: LoggerKit/Support/Tests-Info.plist
       IPHONEOS_DEPLOYMENT_TARGET: 11.0
     dependencies:
-      - target: LoggerKit
+    - target: LoggerKit

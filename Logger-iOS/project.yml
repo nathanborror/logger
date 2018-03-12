@@ -1,13 +1,13 @@
 fileGroups:
-  - Logger-iOS
+- Logger-iOS
 targets:
   Logger-iOS:
     type: application
     platform: iOS
     sources:
-      - Logger-iOS/Sources
-      - Logger-iOS/Support/Assets.xcassets
-      - Logger-iOS/Support/Base.lproj
+    - Logger-iOS/Sources
+    - Logger-iOS/Support/Assets.xcassets
+    - Logger-iOS/Support/Base.lproj
     settings:
       PRODUCT_NAME: Logger
       PRODUCT_BUNDLE_IDENTIFIER: run.nathan.$(PRODUCT_NAME)
@@ -17,24 +17,25 @@ targets:
       OTHER_SWIFT_FLAGS: "-Onone -Xfrontend -warn-long-function-bodies=100 -Xfrontend -warn-long-expression-type-checking=100"
     scheme:
       testTargets:
-        - Logger-iOSTests
+      - Logger-iOSTests
     dependencies:
-      - target: LoggerKit
-      - target: SQLite
-      - target: Differ
+    - target: LoggerKit
+    - target: SQLite
+    - target: Differ
+    - target: Attributed
     postbuildScripts:
-      - path: Scripts/increment-build.sh
-        name: Increment Build
-        runOnlyWhenInstalling: true
+    - path: Scripts/increment-build.sh
+      name: Increment Build
+      runOnlyWhenInstalling: true
   
   Logger-iOSTests:
     type: bundle.unit-test
     platform: iOS
     sources: 
-      - Logger-iOS/Tests
+    - Logger-iOS/Tests
     settings:
       INFOPLIST_FILE: Logger-iOS/Support/Tests-Info.plist
       IPHONEOS_DEPLOYMENT_TARGET: 11.0
     dependencies:
-      - target: Logger-iOS
+    - target: Logger-iOS
   
