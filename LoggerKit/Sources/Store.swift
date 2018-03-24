@@ -15,12 +15,30 @@ class Store {
         let tables: [String] = [
             """
             CREATE TABLE IF NOT EXISTS entry (
-                id text NOT NULL PRIMARY KEY,
+                id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                 text text NOT NULL,
                 color integer NOT NULL,
                 created integer NOT NULL,
                 modified integer NOT NULL
             );
+            """,
+            """
+            CREATE VIRTUAL TABLE IF NOT EXISTS entry_index USING fts5(text, tokenize=porter);
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS after_entry_insert AFTER INSERT ON entry BEGIN
+                INSERT INTO entry_index (rowid, text) VALUES (new.id, new.text);
+            END;
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS after_entry_update AFTER UPDATE OF text ON entry BEGIN
+                UPDATE entry_index SET text = new.text WHERE rowid = old.id;
+            END;
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS after_entry_insert AFTER DELETE ON entry BEGIN
+                DELETE FROM entry_index WHERE rowid = old.id;
+            END;
             """,
         ]
         for table in tables {
@@ -38,13 +56,13 @@ class Store {
         return EntriesResponse(entries: results)
     }
 
-    func entry(id: UUID) throws -> Entry {
+    func entry(id: Int) throws -> Entry {
         var results: [Entry] = []
         let select = """
             SELECT id, text, color, created, modified
             FROM entry WHERE id = ?;
             """
-        for row in try db.prepare(select).bind(id.uuidString) {
+        for row in try db.prepare(select).bind(id) {
             results.append(Entry(row: row))
         }
         guard let entry = results.first else {
@@ -55,35 +73,43 @@ class Store {
 
     func insert(entry rec: Entry) throws -> Entry {
         let insert = """
-            INSERT INTO entry (id, text, color, created, modified)
-            VALUES (?, ?, ?, ?, ?);
+            INSERT INTO entry (text, color, created, modified)
+            VALUES (?, ?, ?, ?);
             """
         let prepared = try db.prepare(insert)
-        let id = UUID()
-        try prepared.run(id.uuidString, rec.text, rec.color, rec.created, rec.modified)
+        try prepared.run(rec.text, rec.color, rec.created, rec.modified)
         guard db.changes == 1 else {
             throw StoreError.failure("Failed to insert entry")
         }
-        return try entry(id: id)
+        return try entry(id: Int(db.lastInsertRowid))
     }
 
-    func update(entry rec: Entry, id: UUID) throws -> Entry {
+    func update(entry rec: Entry, id: Int) throws -> Entry {
         let update = "UPDATE entry SET text=?, color=?, modified=? WHERE id=?;"
         let prepared = try db.prepare(update)
-        try prepared.run(rec.text, rec.color, rec.modified, id.uuidString)
+        try prepared.run(rec.text, rec.color, rec.modified, id)
         guard db.changes == 1 else {
             throw StoreError.failure("Failed to update entry")
         }
         return try entry(id: id)
     }
 
-    func delete(entry id: UUID) throws {
+    func delete(entry id: Int) throws {
         let delete = "DELETE FROM entry WHERE id = ?"
         let prepared = try db.prepare(delete)
-        try prepared.run(id.uuidString)
+        try prepared.run(id)
         guard db.changes == 1 else {
             throw StoreError.failure("Failed to delete entry")
         }
+    }
+
+    func search(entries query: String) throws -> [Int] {
+        var results: [Int?] = []
+        let select = "SELECT rowid FROM entry_index WHERE entry_index MATCH 'text:\(query) * ';"
+        for row in try db.prepare(select) {
+            results.append(encodeInt(row[0]))
+        }
+        return results.flatMap{ $0 }
     }
 }
 
@@ -95,7 +121,7 @@ enum StoreError: Error {
 extension Store {
 
     struct Entry {
-        var id: UUID
+        var id: Int
         var text: String
         var color: Int
         var created: Int
@@ -110,14 +136,14 @@ extension Store {
 extension Store.Entry {
 
     init(row: Statement.Element) {
-        self.id         = encodeUUID(row[0])!
+        self.id         = encodeInt(row[0])!
         self.text       = row[1] as! String
         self.color      = encodeInt(row[2])!
         self.created    = encodeInt(row[3])!
         self.modified   = encodeInt(row[4])!
     }
 
-    init(id: UUID = UUID(), text: String, color: Int = 0, modified: Int = Date.since1970, created: Int = Date.since1970) {
+    init(id: Int = 0, text: String, color: Int = 0, modified: Int = Date.since1970, created: Int = Date.since1970) {
         self.id = id
         self.text = text
         self.color = color
@@ -129,9 +155,4 @@ extension Store.Entry {
 private func encodeInt(_ value: Binding?) -> Int? {
     guard let value = value as? Int64 else { return nil }
     return Int(value)
-}
-
-private func encodeUUID(_ value: Binding?) -> UUID? {
-    guard let value = value as? String else { return nil }
-    return UUID(uuidString: value)
 }

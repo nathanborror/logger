@@ -6,8 +6,10 @@ class EntryCell: UITableViewCell {
 
     var contentInset = UIEdgeInsets(top: 1, left: 8, bottom: 0, right: 32)
     var entryInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+    var onHashtagTap: ((String) -> Void)?
+    var onLinkTap: ((String) -> Void)?
 
-    private lazy var entryView: AttributedTextView = {
+    lazy var entryView: AttributedTextView = {
         let view = AttributedTextView()
         view.font = .preferredFont(forTextStyle: .body)
         view.textColor = .white
@@ -16,6 +18,7 @@ class EntryCell: UITableViewCell {
         view.isScrollEnabled = false
         view.isEditable = false
         view.backgroundColor = .black
+        view.tintColor = .lightGray
         self.contentView.addSubview(view)
         return view
     }()
@@ -23,8 +26,8 @@ class EntryCell: UITableViewCell {
     func configure(with entry: Entry) {
         self.selectionStyle = .none
         self.entryView.attributer = entry.text.white.size(17)
-            .matchMentions.lightGray
-            .matchHashtags.lightGray
+            .matchHashtags.lightGray.makeInteract { self.onHashtagTap?($0) }
+            .matchLinks.lightGray.makeInteract { self.onLinkTap?($0) }
         self.contentView.backgroundColor = .black
         self.contentView.layer.cornerRadius = 18
     }

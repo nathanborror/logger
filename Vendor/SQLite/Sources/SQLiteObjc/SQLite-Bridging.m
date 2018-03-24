@@ -23,7 +23,6 @@
 //
 
 #import "SQLite-Bridging.h"
-#import "fts3_tokenizer.h"
 
 #pragma mark - FTS
 

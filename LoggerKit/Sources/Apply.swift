@@ -5,6 +5,7 @@ extension State {
     init() {
         self.entries = [:]
         self.timeline = Timeline()
+        self.search = Search()
     }
 
     mutating func apply(entries: [Store.Entry]) {
@@ -44,6 +45,19 @@ extension Timeline {
         }
         self.days = days
         self.lastUpdated = Date()
+    }
+}
+
+extension Search {
+
+    init() {
+        self.query = nil
+        self.results = []
+    }
+
+    mutating func apply(entries: [Int], for query: String?) {
+        self.query = query
+        self.results = entries
     }
 }
 

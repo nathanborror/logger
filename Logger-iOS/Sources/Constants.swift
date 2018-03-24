@@ -16,4 +16,6 @@ extension UIColor {
 }
 
 extension UIImage {
+
+    static let iconSearch = UIImage(named: "Search")!.withRenderingMode(.alwaysTemplate)
 }

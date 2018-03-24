@@ -19,22 +19,31 @@ extension Kit {
         commit { $0.apply(entry: entry) }
     }
 
-    public static func entry(_ id: UUID, setText text: String) throws {
+    public static func entry(_ id: Int, setText text: String) throws {
         var entry = try store.entry(id: id)
         entry.text = text
         entry = try store.update(entry: entry, id: id)
         commit { $0.apply(entry: entry) }
     }
 
-    public static func entry(_ id: UUID, setColor color: Int) throws {
+    public static func entry(_ id: Int, setColor color: Int) throws {
         var entry = try store.entry(id: id)
         entry.color = color
         entry = try store.update(entry: entry, id: id)
         commit { $0.apply(entry: entry) }
     }
     
-    public static func entryDelete(entry id: UUID) throws {
+    public static func entryDelete(entry id: Int) throws {
         try store.delete(entry: id)
         commit { $0.entries.removeValue(forKey: id) }
+    }
+
+    public static func entrySearch(_ query: String?) throws {
+        if query == nil || query?.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
+            commit { $0.search.apply(entries: [], for: nil) }
+            return
+        }
+        let ids = try store.search(entries: query!)
+        commit { $0.search.apply(entries: ids, for: query) }
     }
 }
