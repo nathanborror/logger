@@ -12,13 +12,13 @@ class EntryCell: UITableViewCell {
     lazy var entryView: AttributedTextView = {
         let view = AttributedTextView()
         view.font = .preferredFont(forTextStyle: .body)
-        view.textColor = .white
+        view.textColor = .entryText
         view.textContainerInset = .zero
         view.textContainer.lineFragmentPadding = 0
         view.isScrollEnabled = false
         view.isEditable = false
-        view.backgroundColor = .black
-        view.tintColor = .lightGray
+        view.backgroundColor = .entryBackground
+        view.tintColor = .entryTint
         self.contentView.addSubview(view)
         return view
     }()
@@ -26,9 +26,9 @@ class EntryCell: UITableViewCell {
     func configure(with entry: Entry) {
         self.selectionStyle = .none
         self.entryView.attributer = entry.text.white.size(17)
-            .matchHashtags.lightGray.makeInteract { self.onHashtagTap?($0) }
-            .matchLinks.lightGray.makeInteract { self.onLinkTap?($0) }
-        self.contentView.backgroundColor = .black
+            .matchHashtags.color(.entryTint).makeInteract { self.onHashtagTap?($0) }
+            .matchLinks.color(.entryTint).makeInteract { self.onLinkTap?($0) }
+        self.contentView.backgroundColor = .entryBackground
         self.contentView.layer.cornerRadius = 18
     }
 
