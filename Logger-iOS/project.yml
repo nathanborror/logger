@@ -7,7 +7,7 @@ targets:
     sources:
     - Logger-iOS/Sources
     - Logger-iOS/Support/Assets.xcassets
-    - Logger-iOS/Support/Base.lproj
+    - Logger-iOS/Support/LaunchScreen.storyboard
     settings:
       PRODUCT_NAME: Logger
       PRODUCT_BUNDLE_IDENTIFIER: run.nathan.$(PRODUCT_NAME)
