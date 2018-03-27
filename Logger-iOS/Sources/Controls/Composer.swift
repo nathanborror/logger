@@ -37,6 +37,7 @@ class Composer: UIControl {
     let contentView = UIView()
     let textView = UITextView()
     let searchIcon = UIImageView()
+    let clearButton = UIButton()
 
     var textViewHeightAnchor: NSLayoutConstraint!
 
@@ -66,6 +67,13 @@ class Composer: UIControl {
         searchIcon.isHidden = true
         contentView.addSubview(searchIcon)
 
+        clearButton.setImage(.iconClear, for: .normal)
+        clearButton.tintColor = .lightGray
+        clearButton.isHidden = true
+        clearButton.addTarget(self, action: #selector(handleClearSearch), for: .touchUpInside)
+        clearButton.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(clearButton)
+
         textViewHeightAnchor = textView.heightAnchor.constraint(equalToConstant: 96)
 
         NSLayoutConstraint.activate([
@@ -79,10 +87,15 @@ class Composer: UIControl {
             textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: insets.left),
             textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -insets.right),
 
-            searchIcon.topAnchor.constraint(equalTo: contentView.topAnchor, constant: insets.top+8),
-            searchIcon.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -(insets.bottom+8)),
-            searchIcon.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: insets.left+8),
-            searchIcon.widthAnchor.constraint(equalTo: searchIcon.heightAnchor),
+            searchIcon.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -(insets.bottom + 8)),
+            searchIcon.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: (insets.left + 6)),
+            searchIcon.widthAnchor.constraint(equalToConstant: 24),
+            searchIcon.heightAnchor.constraint(equalToConstant: 24),
+
+            clearButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -(insets.bottom - 3)),
+            clearButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
+            clearButton.widthAnchor.constraint(equalToConstant: 44),
+            clearButton.heightAnchor.constraint(equalToConstant: 44),
         ])
 
         reload()
@@ -124,11 +137,17 @@ class Composer: UIControl {
 
     // MARK: - Search
 
+    @objc private func handleClearSearch() {
+        reload()
+        searchModeOff()
+    }
+
     private func searchModeOn() {
         guard searchIcon.isHidden else {
             return
         }
         searchIcon.isHidden = false
+        clearButton.isHidden = false
         var textInsets = textView.textContainerInset
         textInsets.left += 32
         textView.textContainerInset = textInsets
@@ -139,6 +158,7 @@ class Composer: UIControl {
             return
         }
         searchIcon.isHidden = true
+        clearButton.isHidden = true
         var textInsets = textView.textContainerInset
         textInsets.left -= 32
         textView.textContainerInset = textInsets

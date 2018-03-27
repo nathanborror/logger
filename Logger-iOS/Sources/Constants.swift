@@ -17,4 +17,5 @@ extension UIColor {
 extension UIImage {
 
     static let iconSearch = UIImage(named: "Search")!.withRenderingMode(.alwaysTemplate)
+    static let iconClear = UIImage(named: "Clear")!.withRenderingMode(.alwaysTemplate)
 }
