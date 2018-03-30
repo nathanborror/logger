@@ -1,22 +1,27 @@
 import UIKit
 import LoggerKit
-import Attributed
 
 class EntryCell: UITableViewCell {
 
     var contentInset = UIEdgeInsets(top: 1, left: 8, bottom: 0, right: 32)
     var entryInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
     var onHashtagTap: ((String) -> Void)?
-    var onLinkTap: ((String) -> Void)?
-
-    lazy var entryView: AttributedTextView = {
-        let view = AttributedTextView()
+    var onLinkTap: ((URL) -> Void)?
+    
+    lazy var entryView: UILabel = {
+        let view = ActiveLabel()
         view.font = .preferredFont(forTextStyle: .body)
         view.textColor = .entryText
-        view.textContainerInset = .zero
-        view.textContainer.lineFragmentPadding = 0
-        view.isScrollEnabled = false
-        view.isEditable = false
+        view.hashtagColor = .entryTint
+        view.URLColor = .entryTint
+        view.numberOfLines = 0
+        view.enabledTypes = [.url, .hashtag]
+        view.handleURLTap { [weak self] url in
+            self?.onLinkTap?(url)
+        }
+        view.handleHashtagTap { [weak self] tag in
+            self?.onHashtagTap?(tag)
+        }
         view.backgroundColor = .entryBackground
         view.tintColor = .entryTint
         self.contentView.addSubview(view)
@@ -24,12 +29,9 @@ class EntryCell: UITableViewCell {
     }()
 
     func configure(with entry: Entry) {
-        self.selectionStyle = .none
-        self.entryView.attributer = entry.text.white.size(17)
-            .matchHashtags.color(.entryTint).makeInteract { self.onHashtagTap?($0) }
-            .matchLinks.color(.entryTint).makeInteract { self.onLinkTap?($0) }
-        self.contentView.backgroundColor = .entryBackground
-        self.contentView.layer.cornerRadius = 18
+        entryView.text = entry.text
+        contentView.backgroundColor = .entryBackground
+        contentView.layer.cornerRadius = 18
     }
 
     override func sizeThatFits(_ size: CGSize) -> CGSize {

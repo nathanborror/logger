@@ -7,4 +7,3 @@ include:
 - LoggerKit/project.yml
 - Vendor/SQLite/project.yml
 - Vendor/Differ/project.yml
-- Vendor/Attributed/project.yml

@@ -33,12 +33,17 @@ class EntriesTableVC: UIViewController {
         tableView.register(EntryCell.self, forCellReuseIdentifier: "EntryCell")
         tableView.keyboardDismissMode = .interactive
         tableView.separatorStyle = .none
+        tableView.allowsSelection = false
         tableView.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 16, right: 0)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
 
         composer.addTarget(self, action: #selector(handleSendHit), for: .primaryActionTriggered)
         composer.addTarget(self, action: #selector(handleSearchChange), for: .searchQueryChanged)
+
+        // Provides secondary actions for entries
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
+        tableView.addGestureRecognizer(longPress)
 
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -89,6 +94,15 @@ class EntriesTableVC: UIViewController {
         try! Kit.entrySearch(sender.query)
     }
 
+    @objc func handleLongPress(recognizer: UILongPressGestureRecognizer) {
+        let point = recognizer.location(in: tableView)
+        guard let indexPath = tableView.indexPathForRow(at: point) else {
+            return
+        }
+        let entry = model.entries[indexPath.row]
+        showActions(for: entry)
+    }
+
     func handleHashtag(_ tag: String) {
         var query = tag
         query.removeFirst(3)
@@ -96,10 +110,22 @@ class EntriesTableVC: UIViewController {
         try! Kit.entrySearch(query)
     }
 
-    func handleLink(_ link: String) {
-        guard let url = URL(string: link) else { return }
+    func handleLink(_ url: URL) {
         let controller = SFSafariViewController(url: url)
         present(controller, animated: true, completion: nil)
+    }
+
+    func showActions(for entry: Entry) {
+        let vc = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        vc.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        vc.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
+            do {
+                try Kit.entryDelete(entry: entry.id)
+            } catch {
+                print(error)
+            }
+        })
+        present(vc, animated: true, completion: nil)
     }
 
     // MARK: - Keyboard
@@ -117,11 +143,6 @@ class EntriesTableVC: UIViewController {
     }
 
     @objc func keyboardWillHide(notification: Notification) {
-
-    }
-
-    override func viewSafeAreaInsetsDidChange() {
-        //print(view.safeAreaInsets)
     }
 }
 
@@ -138,20 +159,8 @@ extension EntriesTableVC: UITableViewDataSource, UITableViewDelegate {
         let entry = model.entries[indexPath.row]
         cell.configure(with: entry)
         cell.onHashtagTap = { [weak self] tag in self?.handleHashtag(tag) }
-        cell.onLinkTap = { [weak self] link in self?.handleLink(link) }
+        cell.onLinkTap = { [weak self] url in self?.handleLink(url) }
         return cell
-    }
-
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        defer { tableView.deselectRow(at: indexPath, animated: true) }
-
-        let entry = model.entries[indexPath.row]
-        let vc = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        vc.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        vc.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
-            try! Kit.entryDelete(entry: entry.id)
-        })
-        present(vc, animated: true, completion: nil)
     }
 }
 
@@ -177,7 +186,7 @@ struct EntriesModel {
 
     mutating func filter(_ entries: [Int: Entry], ids: [Int]) -> [Entry] {
         if ids.count > 0 {
-            return ids.map { entries[$0] }.flatMap{ $0 }
+            return ids.map { entries[$0] }.compactMap { $0 }
         } else {
             return Array(entries.values).sorted { $0.created < $1.created }
         }

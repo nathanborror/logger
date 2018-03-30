@@ -12,17 +12,19 @@ targets:
       PRODUCT_NAME: Logger
       PRODUCT_BUNDLE_IDENTIFIER: run.nathan.$(PRODUCT_NAME)
       INFOPLIST_FILE: $(SRCROOT)/Logger-iOS/Support/Info.plist
+      CODE_SIGN_ENTITLEMENTS: $(SRCROOT)/Logger-iOS/Support/Logger.entitlements
       DEVELOPMENT_TEAM: 294VZ3T33E
       IPHONEOS_DEPLOYMENT_TARGET: 11.0
       OTHER_SWIFT_FLAGS: "-Onone -Xfrontend -warn-long-function-bodies=100 -Xfrontend -warn-long-expression-type-checking=100"
     scheme:
       testTargets:
       - Logger-iOSTests
+      environmentVariables:
+        OS_ACTIVITY_MODE: disable
     dependencies:
     - target: LoggerKit
     - target: SQLite
     - target: Differ
-    - target: Attributed
     postbuildScripts:
     - path: Scripts/increment-build.sh
       name: Increment Build
