@@ -18,6 +18,7 @@ class SQLDocument: UIDocument {
         case none
         case loading
         case ready
+        case conflicted
     }
 
     private(set) var db: Connection!
@@ -56,7 +57,7 @@ class SQLDocument: UIDocument {
             return
         }
         guard !documentState.contains(.inConflict) else {
-            stage = .none // TODO: Enter into error stage
+            stage = .conflicted // TODO: Enter into error stage
             return
         }
         guard !documentState.contains(.closed) else {
@@ -133,6 +134,12 @@ class Store {
                 self.stage = .loading
             case .ready:
                 self.stage = self.isDatabaseInitialized ? .ready : .loading
+            case .conflicted:
+                print("Resolving conflicts...")
+                try! NSFileVersion.removeOtherVersionsOfItem(at: self.document.fileURL)
+                NSFileVersion.unresolvedConflictVersionsOfItem(at: self.document.fileURL)?.forEach {
+                    $0.isResolved = true
+                }
             }
         }
 

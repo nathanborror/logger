@@ -62,8 +62,11 @@ public class Kit {
 extension Kit: StoreDelegate {
 
     func store(_ store: Store, didChangeStage stage: Store.Stage) {
-        guard stage == .ready else { return }
-        do    { try Kit.activate() }
-        catch { print(error) }
+        switch stage {
+        case .ready:
+            try! Kit.activate()
+        case .loading, .none:
+            break
+        }
     }
 }
