@@ -208,7 +208,11 @@ public protocol FailableIterator : IteratorProtocol {
 
 extension FailableIterator {
     public func next() -> Element? {
-        return try! failableNext()
+        do {
+            return try failableNext()
+        } catch {
+            fatalError(error.localizedDescription)
+        }
     }
 }
 
