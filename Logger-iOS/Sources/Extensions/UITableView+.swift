@@ -9,7 +9,7 @@ extension UITableView {
     /// - parameter old:            The previous state of the collection view.
     /// - parameter new:            The current state of the collection view.
     /// - parameter updateData:     Block for caller to update the data that underlies collection view dataSource.
-    func applyDiff<T: Collection>(prior: T, section: Int = 0, animation: UITableViewRowAnimation = .automatic, updateData: () -> T) where T.Iterator.Element: Hashable, T.IndexDistance == Int, T.Index == Int {
+    func applyDiff<T: Collection>(prior: T, section: Int = 0, animation: UITableViewRowAnimation = .automatic, updateData: () -> T) where T.Iterator.Element: Hashable, T.Index == Int {
         var update: ListUpdate?
 
         performBatchUpdates({
