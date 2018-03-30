@@ -61,15 +61,22 @@ class EntriesTableVC: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        guard model.isCloudEnabled else { return }
         composer.textView.becomeFirstResponder()
     }
 
     @objc func stateChange() {
-        if model.applyEntries(Kit.state) {
+        let state = Kit.state
+        if model.applySettings(state) {
+            tableView.isHidden = true
+            composer.isHidden = true
+            composer.textView.resignFirstResponder()
+        }
+        if model.applyEntries(state) {
             tableView.reloadData()
             scrollToBottom(animated: true)
         }
-        if model.applySearch(Kit.state) {
+        if model.applySearch(state) {
             tableView.reloadData()
         }
     }
@@ -168,6 +175,14 @@ struct EntriesModel {
 
     var entries: [Entry] = []
     var matches: [Int] = []
+    var isCloudEnabled = true
+
+    mutating func applySettings(_ state: State) -> Bool {
+        let stateCloudEnabled = state.isCloudEnabled
+        guard stateCloudEnabled != isCloudEnabled else { return false }
+        isCloudEnabled = stateCloudEnabled
+        return true
+    }
 
     mutating func applyEntries(_ state: State) -> Bool {
         let stateEntries = Array(state.entries.values).sorted { $0.created < $1.created }

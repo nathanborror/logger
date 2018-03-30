@@ -6,6 +6,7 @@ extension State {
         self.entries = [:]
         self.timeline = Timeline()
         self.search = Search()
+        self.isCloudEnabled = true
     }
 
     mutating func apply(entries: [Store.Entry]) {

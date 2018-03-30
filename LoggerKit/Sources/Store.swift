@@ -4,22 +4,10 @@ import UIKit
 
 // MARK: - URLs
 
-internal var localDatabaseURL: URL {
-    let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last!
-    return dir.appendingPathComponent("logger.db")
-}
-
 internal var cloudDatabaseURL: URL {
     let dir = FileManager.default.url(forUbiquityContainerIdentifier: nil)!.appendingPathComponent("Documents")
     try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
     return dir.appendingPathComponent("logger.db")
-}
-
-internal var databaseURL: URL {
-    if FileManager.default.ubiquityIdentityToken != nil {
-        return cloudDatabaseURL
-    }
-    return localDatabaseURL
 }
 
 // MARK: - SQL Document
@@ -38,7 +26,7 @@ class SQLDocument: UIDocument {
     var stageChange: ((Stage) -> Void)?
 
     init() {
-        super.init(fileURL: databaseURL)
+        super.init(fileURL: cloudDatabaseURL)
         NotificationCenter.default.addObserver(self, selector: #selector(documentDidChange),
                                                name: .UIDocumentStateChanged, object: self)
     }

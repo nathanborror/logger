@@ -22,12 +22,26 @@ public class Kit {
         self.images = Images()
         self.downloads = DispatchQueue(label: "downloads.queue")
         self.commits = DispatchQueue(label: "commits.queue")
+
+        guard FileManager.default.ubiquityIdentityToken != nil else {
+            self.state.isCloudEnabled = false
+            return
+        }
         self.store = try! Store(delegate: self)
     }
 
     public static func observe(_ observer: Any, selector: Selector) {
         NotificationCenter.default.addObserver(observer, selector: selector, name: Kit.StateDidChange, object: nil)
         notify()
+    }
+
+    public static func retryCloud() {
+        guard FileManager.default.ubiquityIdentityToken != nil else {
+            commit { $0.isCloudEnabled = false }
+            return
+        }
+        shared.store = try! Store(delegate: shared)
+        commit { $0.isCloudEnabled = true }
     }
 
     internal static func commit(_ mutation: @escaping (inout State) -> Void) {
