@@ -122,19 +122,10 @@ class Store {
     private(set) var stage: Stage = .none { didSet { handleStageDidChange(oldValue) }}
     private(set) var isDatabaseInitialized: Bool = false
 
-//    internal var metadataQuery: NSMetadataQuery!
-//    internal let metadataQueue: OperationQueue = {
-//        let queue = OperationQueue()
-//        queue.name = "run.nathan.Logger.queue"
-//        queue.maxConcurrentOperationCount = 1
-//        return queue
-//    }()
-
     init(delegate: StoreDelegate? = nil) throws {
         self.delegate = delegate
 
         document.stageChange = { stage in
-            //print("Document stage change: \(stage)")
             switch stage {
             case .none:
                 self.stage = .none
@@ -148,30 +139,7 @@ class Store {
         document.open { success in
             try! self.setupDatabase()
         }
-
-//        metadataQuery = NSMetadataQuery()
-//        metadataQuery.predicate = NSPredicate(format: "%K LIKE %@", NSMetadataItemFSNameKey, "*.sqlite")
-//        metadataQuery.searchScopes = [
-//            NSMetadataQueryUbiquitousDataScope,
-//            NSMetadataQueryAccessibleUbiquitousExternalDocumentsScope,
-//        ]
-//        metadataQuery.operationQueue = metadataQueue
-//
-//        NotificationCenter.default.addObserver(self, selector: #selector(metadataFinishedGathering),
-//                                               name: .NSMetadataQueryDidFinishGathering, object: metadataQuery)
-//        NotificationCenter.default.addObserver(self, selector: #selector(metadataDidUpdate),
-//                                               name: .NSMetadataQueryDidUpdate, object: metadataQuery)
-//
-//        metadataQuery.start()
     }
-
-//    @objc func metadataFinishedGathering(notification: NSNotification) {
-//        print("metadataFinishedGathering:", notification)
-//    }
-//
-//    @objc func metadataDidUpdate(notification: NSNotification) {
-//        print("metadataDidUpdate:", notification)
-//    }
 
     func handleStageDidChange(_ oldStage: Stage) {
         guard oldStage != stage else { return }
