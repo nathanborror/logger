@@ -77,7 +77,11 @@ class EntriesTableVC: UIViewController {
 
     @objc func handleSendHit() {
         guard let text = composer.text else { return }
-        try! Kit.entryCreate(text)
+        do {
+            try Kit.entryCreate(text)
+        } catch {
+            print(error)
+        }
         composer.reload()
     }
 

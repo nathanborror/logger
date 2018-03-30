@@ -15,10 +15,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        try! Kit.activate()
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
-        try! Kit.suspend()
     }
 }

@@ -7,11 +7,11 @@ public class Kit {
     public static var images: Images { return shared.images }
     public static var state: State { return shared.state }
 
-    internal static var shared: Kit = Kit()
-    internal static var store: Store { return shared.store }
+    static var shared: Kit = Kit()
+    static var store: Store { return shared.store }
 
     internal var state: State
-    internal var store: Store
+    internal var store: Store!
     internal var images: Images
 
     internal var downloads: DispatchQueue
@@ -19,10 +19,10 @@ public class Kit {
 
     init() {
         self.state = State()
-        self.store = try! Store()
         self.images = Images()
         self.downloads = DispatchQueue(label: "downloads.queue")
         self.commits = DispatchQueue(label: "commits.queue")
+        self.store = try! Store(delegate: self)
     }
 
     public static func observe(_ observer: Any, selector: Selector) {
@@ -42,5 +42,14 @@ public class Kit {
     internal static func notify() {
         assert(Thread.isMainThread)
         NotificationCenter.default.post(name: StateDidChange, object: nil, userInfo: nil)
+    }
+}
+
+extension Kit: StoreDelegate {
+
+    func store(_ store: Store, didChangeStage stage: Store.Stage) {
+        guard stage == .ready else { return }
+        do    { try Kit.activate() }
+        catch { print(error) }
     }
 }
