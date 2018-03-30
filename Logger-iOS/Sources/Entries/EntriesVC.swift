@@ -17,6 +17,9 @@ class EntriesTableVC: UIViewController {
     private var composer = Composer()
     private var initialSafeAreaInsets: UIEdgeInsets = .zero
 
+    private var reloadMessage = UILabel()
+    private var reload = UIButton(type: .system)
+
     override var inputAccessoryView: UIView? {
         return composer
     }
@@ -27,6 +30,20 @@ class EntriesTableVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        reloadMessage.text = "iCloud is required to begin."
+        reloadMessage.textColor = UIColor(hex: 0xCCCCCC)
+        reloadMessage.sizeToFit()
+        reloadMessage.translatesAutoresizingMaskIntoConstraints = false
+        reloadMessage.isHidden = true
+        view.addSubview(reloadMessage)
+
+        reload.addTarget(self, action: #selector(handleReloadCloud), for: .primaryActionTriggered)
+        reload.setTitle("Try Again", for: .normal)
+        reload.setTitleColor(UIColor(hex: 0x888888), for: .normal)
+        reload.translatesAutoresizingMaskIntoConstraints = false
+        reload.isHidden = true
+        view.addSubview(reload)
 
         tableView.delegate = self
         tableView.dataSource = self
@@ -51,6 +68,12 @@ class EntriesTableVC: UIViewController {
             tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.contentLayoutGuide.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+
+            reloadMessage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            reloadMessage.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+
+            reload.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            reload.topAnchor.constraint(equalTo: reloadMessage.bottomAnchor, constant: 8)
         ])
 
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
@@ -68,9 +91,19 @@ class EntriesTableVC: UIViewController {
     @objc func stateChange() {
         let state = Kit.state
         if model.applySettings(state) {
-            tableView.isHidden = true
-            composer.isHidden = true
-            composer.textView.resignFirstResponder()
+            if model.isCloudEnabled {
+                reload.isHidden = true
+                reloadMessage.isHidden = true
+                tableView.isHidden = false
+                composer.isHidden = false
+                composer.textView.becomeFirstResponder()
+            } else {
+                reload.isHidden = false
+                reloadMessage.isHidden = false
+                tableView.isHidden = true
+                composer.isHidden = true
+                composer.textView.resignFirstResponder()
+            }
         }
         if model.applyEntries(state) {
             tableView.reloadData()
@@ -108,6 +141,10 @@ class EntriesTableVC: UIViewController {
         }
         let entry = model.entries[indexPath.row]
         showActions(for: entry)
+    }
+
+    @objc func handleReloadCloud() {
+        Kit.retryCloud()
     }
 
     func handleHashtag(_ tag: String) {
