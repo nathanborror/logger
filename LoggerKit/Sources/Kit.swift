@@ -1,5 +1,10 @@
 import Foundation
 
+var defaultDatabaseURL: URL {
+    let dir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+    return dir.appendingPathComponent("data.logger")
+}
+
 public class Kit {
 
     public static let StateDidChange = Notification.Name("KitStateDidChange")
@@ -20,14 +25,17 @@ public class Kit {
     init() {
         self.state = State()
         self.images = Images()
+        self.store = try! Store(url: defaultDatabaseURL)
         self.downloads = DispatchQueue(label: "downloads.queue")
         self.commits = DispatchQueue(label: "commits.queue")
 
-        guard FileManager.default.ubiquityIdentityToken != nil else {
-            self.state.isCloudEnabled = false
-            return
+        NotificationCenter.default.addObserver(forName: .UIApplicationDidBecomeActive, object: nil, queue: nil) { _ in
+            try! Kit.activate()
         }
-        self.store = try! Store(delegate: self)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     public static func observe(_ observer: Any, selector: Selector) {
@@ -35,13 +43,11 @@ public class Kit {
         notify()
     }
 
-    public static func retryCloud() {
-        guard FileManager.default.ubiquityIdentityToken != nil else {
-            commit { $0.isCloudEnabled = false }
-            return
-        }
-        shared.store = try! Store(delegate: shared)
-        commit { $0.isCloudEnabled = true }
+    public static func replaceDatabase(with url: URL) throws {
+        let data = try Data(contentsOf: url)
+        FileManager.default.createFile(atPath: defaultDatabaseURL.path, contents: data)
+        shared.store = try Store(url: defaultDatabaseURL)
+        try Kit.activate()
     }
 
     internal static func commit(_ mutation: @escaping (inout State) -> Void) {
@@ -56,17 +62,5 @@ public class Kit {
     internal static func notify() {
         assert(Thread.isMainThread)
         NotificationCenter.default.post(name: StateDidChange, object: nil, userInfo: nil)
-    }
-}
-
-extension Kit: StoreDelegate {
-
-    func store(_ store: Store, didChangeStage stage: Store.Stage) {
-        switch stage {
-        case .ready:
-            try! Kit.activate()
-        case .loading, .none:
-            break
-        }
     }
 }

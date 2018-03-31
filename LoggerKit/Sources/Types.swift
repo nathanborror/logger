@@ -4,7 +4,6 @@ public struct State {
     public var entries: [Int: Entry]
     public var timeline: Timeline
     public var search: Search
-    public var isCloudEnabled: Bool
 }
 
 public struct Timeline {

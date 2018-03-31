@@ -13,4 +13,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         return true
     }
+
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        // TODO: Ask people before replacing the database!
+        // TODO: Test bogus files
+        // TODO: Store old databases someplace safe where they can be resurrected
+
+        try! Kit.replaceDatabase(with: url)
+        return true
+    }
 }

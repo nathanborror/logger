@@ -17,9 +17,6 @@ class EntriesTableVC: UIViewController {
     private var composer = Composer()
     private var initialSafeAreaInsets: UIEdgeInsets = .zero
 
-    private var reloadMessage = UILabel()
-    private var reload = UIButton(type: .system)
-
     override var inputAccessoryView: UIView? {
         return composer
     }
@@ -30,20 +27,6 @@ class EntriesTableVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        reloadMessage.text = "iCloud is required to begin."
-        reloadMessage.textColor = UIColor(hex: 0xCCCCCC)
-        reloadMessage.sizeToFit()
-        reloadMessage.translatesAutoresizingMaskIntoConstraints = false
-        reloadMessage.isHidden = true
-        view.addSubview(reloadMessage)
-
-        reload.addTarget(self, action: #selector(handleReloadCloud), for: .primaryActionTriggered)
-        reload.setTitle("Try Again", for: .normal)
-        reload.setTitleColor(UIColor(hex: 0x888888), for: .normal)
-        reload.translatesAutoresizingMaskIntoConstraints = false
-        reload.isHidden = true
-        view.addSubview(reload)
 
         tableView.delegate = self
         tableView.dataSource = self
@@ -68,12 +51,6 @@ class EntriesTableVC: UIViewController {
             tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.contentLayoutGuide.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-
-            reloadMessage.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            reloadMessage.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-
-            reload.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            reload.topAnchor.constraint(equalTo: reloadMessage.bottomAnchor, constant: 8)
         ])
 
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
@@ -84,27 +61,11 @@ class EntriesTableVC: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        guard model.isCloudEnabled else { return }
         composer.textView.becomeFirstResponder()
     }
 
     @objc func stateChange() {
         let state = Kit.state
-        if model.applySettings(state) {
-            if model.isCloudEnabled {
-                reload.isHidden = true
-                reloadMessage.isHidden = true
-                tableView.isHidden = false
-                composer.isHidden = false
-                composer.textView.becomeFirstResponder()
-            } else {
-                reload.isHidden = false
-                reloadMessage.isHidden = false
-                tableView.isHidden = true
-                composer.isHidden = true
-                composer.textView.resignFirstResponder()
-            }
-        }
         if model.applyEntries(state) {
             tableView.reloadData()
             scrollToBottom(animated: true)
@@ -143,10 +104,6 @@ class EntriesTableVC: UIViewController {
         showActions(for: entry)
     }
 
-    @objc func handleReloadCloud() {
-        Kit.retryCloud()
-    }
-
     func handleHashtag(_ tag: String) {
         var query = tag
         query.removeFirst(3)
@@ -170,6 +127,18 @@ class EntriesTableVC: UIViewController {
             }
         })
         present(vc, animated: true, completion: nil)
+    }
+
+    override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
+        guard motion == .motionShake else { return }
+
+        //let url = URL(string: "http://google.com")!
+
+        let dir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+        let file = dir.appendingPathComponent("data.logger")
+
+        let controller = UIActivityViewController(activityItems: [file], applicationActivities: nil)
+        present(controller, animated: true, completion: nil)
     }
 
     // MARK: - Keyboard
@@ -212,14 +181,6 @@ struct EntriesModel {
 
     var entries: [Entry] = []
     var matches: [Int] = []
-    var isCloudEnabled = true
-
-    mutating func applySettings(_ state: State) -> Bool {
-        let stateCloudEnabled = state.isCloudEnabled
-        guard stateCloudEnabled != isCloudEnabled else { return false }
-        isCloudEnabled = stateCloudEnabled
-        return true
-    }
 
     mutating func applyEntries(_ state: State) -> Bool {
         let stateEntries = Array(state.entries.values).sorted { $0.created < $1.created }
