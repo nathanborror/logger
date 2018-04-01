@@ -16,9 +16,8 @@ public protocol ActiveLabelDelegate: class {
 public typealias ConfigureLinkAttribute = (ActiveType, [NSAttributedStringKey : Any], Bool) -> ([NSAttributedStringKey : Any])
 typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveType)
 
-@IBDesignable open class ActiveLabel: UILabel {
+open class ActiveLabel: UILabel {
 
-    // MARK: - public properties
     open weak var delegate: ActiveLabelDelegate?
 
     open var enabledTypes: [ActiveType] = [.mention, .hashtag, .url]
@@ -27,22 +26,22 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
 
     open var configureLinkAttribute: ConfigureLinkAttribute?
 
-    @IBInspectable open var mentionColor: UIColor = .blue {
+    open var mentionColor: UIColor = .blue {
         didSet { updateTextStorage(parseText: false) }
     }
-    @IBInspectable open var mentionSelectedColor: UIColor? {
+    open var mentionSelectedColor: UIColor? {
         didSet { updateTextStorage(parseText: false) }
     }
-    @IBInspectable open var hashtagColor: UIColor = .blue {
+    open var hashtagColor: UIColor = .blue {
         didSet { updateTextStorage(parseText: false) }
     }
-    @IBInspectable open var hashtagSelectedColor: UIColor? {
+    open var hashtagSelectedColor: UIColor? {
         didSet { updateTextStorage(parseText: false) }
     }
-    @IBInspectable open var URLColor: UIColor = .blue {
+    open var URLColor: UIColor = .blue {
         didSet { updateTextStorage(parseText: false) }
     }
-    @IBInspectable open var URLSelectedColor: UIColor? {
+    open var URLSelectedColor: UIColor? {
         didSet { updateTextStorage(parseText: false) }
     }
     open var customColor: [ActiveType : UIColor] = [:] {
@@ -51,26 +50,24 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
     open var customSelectedColor: [ActiveType : UIColor] = [:] {
         didSet { updateTextStorage(parseText: false) }
     }
-    @IBInspectable public var lineSpacing: CGFloat = 0 {
+    public var lineSpacing: CGFloat = 0 {
         didSet { updateTextStorage(parseText: false) }
     }
-    @IBInspectable public var minimumLineHeight: CGFloat = 0 {
+    public var minimumLineHeight: CGFloat = 0 {
         didSet { updateTextStorage(parseText: false) }
     }
-    @IBInspectable public var highlightFontName: String? = nil {
+    public var highlightFontName: String? = nil {
         didSet { updateTextStorage(parseText: false) }
     }
     public var highlightFontSize: CGFloat? = nil {
         didSet { updateTextStorage(parseText: false) }
     }
 
-    // MARK: - Computed Properties
     private var hightlightFont: UIFont? {
         guard let highlightFontName = highlightFontName, let highlightFontSize = highlightFontSize else { return nil }
         return UIFont(name: highlightFontName, size: highlightFontSize)
     }
 
-    // MARK: - public methods
     open func handleMentionTap(_ handler: @escaping (String) -> ()) {
         mentionTapHandler = handler
     }
@@ -110,7 +107,6 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         updateTextStorage()
     }
 
-    // MARK: - override UILabel properties
     override open var text: String? {
         didSet { updateTextStorage() }
     }
@@ -139,7 +135,6 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         didSet { textContainer.lineBreakMode = lineBreakMode }
     }
 
-    // MARK: - init functions
     override public init(frame: CGRect) {
         super.init(frame: frame)
         _customizing = false
@@ -167,8 +162,6 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         layoutManager.drawGlyphs(forGlyphRange: range, at: newOrigin)
     }
 
-
-    // MARK: - customzation
     @discardableResult
     open func customize(_ block: (_ label: ActiveLabel) -> ()) -> ActiveLabel {
         _customizing = true
@@ -178,8 +171,6 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         return self
     }
 
-    // MARK: - Auto layout
-
     open override var intrinsicContentSize: CGSize {
         let superSize = super.intrinsicContentSize
         textContainer.size = CGSize(width: superSize.width, height: CGFloat.greatestFiniteMagnitude)
@@ -187,7 +178,6 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         return CGSize(width: ceil(size.width), height: ceil(size.height))
     }
 
-    // MARK: - touch events
     func onTouch(_ touch: UITouch) -> Bool {
         let location = touch.location(in: self)
         var avoidSuperCall = false
@@ -227,11 +217,9 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         case .stationary:
             break
         }
-
         return avoidSuperCall
     }
 
-    // MARK: - private properties
     fileprivate var _customizing: Bool = true
     fileprivate var defaultCustomColor: UIColor = .black
 
@@ -250,7 +238,7 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
     fileprivate lazy var textContainer = NSTextContainer()
     lazy var activeElements = [ActiveType: [ElementTuple]]()
 
-    // MARK: - helper functions
+    // MARK: - Helpers
 
     fileprivate func setupLabel() {
         textStorage.addLayoutManager(layoutManager)
@@ -301,7 +289,6 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         return CGPoint(x: rect.origin.x, y: glyphOriginY)
     }
 
-    /// add link attribute
     fileprivate func addLinkAttribute(_ mutAttrString: NSMutableAttributedString) {
         var range = NSRange(location: 0, length: 0)
         var attributes = mutAttrString.attributes(at: 0, effectiveRange: &range)
@@ -335,7 +322,6 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         }
     }
 
-    /// use regex check all link ranges
     fileprivate func parseTextAndExtractActiveElements(_ attrString: NSAttributedString) -> String {
         var textString = attrString.string
         var textLength = textString.utf16.count
@@ -365,8 +351,6 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         return textString
     }
 
-
-    /// add line break mode
     fileprivate func addLineBreak(_ attrString: NSAttributedString) -> NSMutableAttributedString {
         let mutAttrString = NSMutableAttributedString(attributedString: attrString)
 
@@ -451,7 +435,8 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
     }
 
 
-    //MARK: - Handle UI Responder touches
+    // MARK: - Touche Events
+
     open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         if onTouch(touch) { return }
@@ -476,7 +461,8 @@ typealias ElementTuple = (range: NSRange, element: ActiveElement, type: ActiveTy
         super.touchesEnded(touches, with: event)
     }
 
-    //MARK: - ActiveLabel handler
+    // MARK: - Handlers
+
     fileprivate func didTapMention(_ username: String) {
         guard let mentionHandler = mentionTapHandler else {
             delegate?.didSelect(username, type: .mention)

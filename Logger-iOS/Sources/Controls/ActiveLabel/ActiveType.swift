@@ -24,7 +24,7 @@ enum ActiveElement {
     }
 }
 
-public enum ActiveType {
+public enum ActiveType: Equatable, Hashable {
     case mention
     case hashtag
     case url
@@ -37,26 +37,5 @@ public enum ActiveType {
         case .url: return RegexParser.urlPattern
         case .custom(let regex): return regex
         }
-    }
-}
-
-extension ActiveType: Hashable, Equatable {
-    public var hashValue: Int {
-        switch self {
-        case .mention: return -1
-        case .hashtag: return -2
-        case .url: return -3
-        case .custom(let regex): return regex.hashValue
-        }
-    }
-}
-
-public func ==(lhs: ActiveType, rhs: ActiveType) -> Bool {
-    switch (lhs, rhs) {
-    case (.mention, .mention): return true
-    case (.hashtag, .hashtag): return true
-    case (.url, .url): return true
-    case (.custom(let pattern1), .custom(let pattern2)): return pattern1 == pattern2
-    default: return false
     }
 }
