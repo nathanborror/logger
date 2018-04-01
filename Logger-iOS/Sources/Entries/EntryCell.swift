@@ -3,18 +3,20 @@ import LoggerKit
 
 class EntryCell: UITableViewCell {
 
-    var contentInset = UIEdgeInsets(top: 1, left: 8, bottom: 0, right: 32)
-    var entryInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+    var contentInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
     var onHashtagTap: ((String) -> Void)?
     var onLinkTap: ((URL) -> Void)?
+
+    private let additionalHeight: CGFloat = 2 // TODO: Figure out why ActiveLabel needs this
+    private let gapHeight: CGFloat = 2
     
     lazy var entryView: UILabel = {
         let view = ActiveLabel()
         view.font = .preferredFont(forTextStyle: .body)
         view.textColor = .entryText
+        view.numberOfLines = 0
         view.hashtagColor = .entryTint
         view.URLColor = .entryTint
-        view.numberOfLines = 0
         view.enabledTypes = [.url, .hashtag]
         view.handleURLTap { [weak self] url in
             self?.onLinkTap?(url)
@@ -31,24 +33,27 @@ class EntryCell: UITableViewCell {
     func configure(with entry: Entry) {
         entryView.text = entry.text
         contentView.backgroundColor = .entryBackground
-        contentView.layer.cornerRadius = 18
+        contentView.layer.cornerRadius = 19
     }
 
     override func sizeThatFits(_ size: CGSize) -> CGSize {
-        let entryFit = size.insetBy(contentInset + entryInset).infiniteHeight()
+        let insets = separatorInset + contentInset
+        let entryFit = size.insetBy(insets).infiniteHeight()
         let entrySize = entryView.sizeThatFits(entryFit)
-        return entrySize.outsetBy(contentInset + entryInset)
+        return entrySize.outsetBy(insets) + CGSize(width: 0, height: gapHeight + additionalHeight)
     }
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        let entryFit = bounds.size.insetBy(entryInset + contentInset)
-        let entrySize = entryView.sizeThatFits(entryFit)
-        var contentSize = contentView.bounds.insetBy(contentInset).size
-        contentSize.width = entrySize.width + entryInset.left + entryInset.right
 
-        entryView.frame = CGRect(origin: entryInset.origin, size: entrySize)
-        contentView.frame = CGRect(origin: contentInset.origin, size: contentSize)
+        let insets = separatorInset + contentInset
+
+        let entryFit = contentView.bounds.size.insetBy(insets)
+        let entrySize = entryView.sizeThatFits(entryFit) + CGSize(width: 0, height: gapHeight)
+        entryView.frame = CGRect(origin: contentInset.origin, size: entrySize)
+
+        let contentSize = entrySize.outsetBy(contentInset)
+        contentView.frame = CGRect(origin: separatorInset.origin, size: contentSize)
     }
 
     override func prepareForReuse() {

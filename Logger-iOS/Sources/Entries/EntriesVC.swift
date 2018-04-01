@@ -34,6 +34,7 @@ class EntriesTableVC: UIViewController {
         tableView.keyboardDismissMode = .interactive
         tableView.separatorStyle = .none
         tableView.allowsSelection = false
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         tableView.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 16, right: 0)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)

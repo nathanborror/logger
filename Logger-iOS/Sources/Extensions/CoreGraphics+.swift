@@ -38,6 +38,11 @@ extension CGSize {
     func outsetBy(_ inset: UIEdgeInsets) -> CGSize {
         return CGSize(width: width + inset.totalHorizontal, height: height + inset.totalVertical)
     }
+
+    /// Returns a size that is the combined width and height.
+    static func + (lhs: CGSize, rhs: CGSize) -> CGSize {
+        return CGSize(width: lhs.width + rhs.width, height: lhs.height + rhs.height)
+    }
 }
 
 extension CGRect {
