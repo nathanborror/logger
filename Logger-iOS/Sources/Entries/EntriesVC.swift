@@ -41,6 +41,7 @@ class EntriesTableVC: UIViewController {
 
         composer.addTarget(self, action: #selector(handleSendHit), for: .primaryActionTriggered)
         composer.addTarget(self, action: #selector(handleSearchChange), for: .searchQueryChanged)
+        composer.addTarget(self, action: #selector(handleComposerFocus), for: .editingDidBegin)
 
         // Provides secondary actions for entries
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
@@ -60,11 +61,6 @@ class EntriesTableVC: UIViewController {
         Kit.observe(self, selector: #selector(stateChange))
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        composer.textView.becomeFirstResponder()
-    }
-
     @objc func stateChange() {
         let state = Kit.state
         if model.applyEntries(state) {
@@ -73,6 +69,7 @@ class EntriesTableVC: UIViewController {
         }
         if model.applySearch(state) {
             tableView.reloadData()
+            scrollToBottom(animated: true)
         }
     }
 
@@ -80,6 +77,10 @@ class EntriesTableVC: UIViewController {
         guard model.entries.count > 0 else { return }
         let indexPath = IndexPath(row: model.entries.count - 1, section: 0)
         tableView.scrollToRow(at: indexPath, at: .bottom, animated: animated)
+    }
+
+    @objc func handleComposerFocus() {
+        scrollToBottom(animated: true)
     }
 
     @objc func handleSendHit() {

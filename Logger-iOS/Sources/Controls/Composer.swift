@@ -230,4 +230,12 @@ extension Composer: UITextViewDelegate {
         guard isPlaceholding else { return }
         textView.selectedTextRange = textView.textRange(from: textView.beginningOfDocument, to: textView.beginningOfDocument)
     }
+
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        sendActions(for: .editingDidBegin)
+    }
+
+    func textViewDidEndEditing(_ textView: UITextView) {
+        sendActions(for: .editingDidEnd)
+    }
 }
