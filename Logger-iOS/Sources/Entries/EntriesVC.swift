@@ -127,6 +127,12 @@ class EntriesTableVC: UIViewController {
                 print(error)
             }
         })
+        vc.addAction(UIAlertAction(title: "Google", style: .default) { _ in
+            let query = entry.text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            let url = URL(string: "https://google.com/search?q=\(query)")!
+            let controller = SFSafariViewController(url: url)
+            self.present(controller, animated: true, completion: nil)
+        })
         present(vc, animated: true, completion: nil)
     }
 
