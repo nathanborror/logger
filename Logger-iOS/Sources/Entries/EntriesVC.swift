@@ -126,7 +126,8 @@ class EntriesTableVC: UIViewController {
             }
         })
         vc.addAction(UIAlertAction(title: "Google", style: .default) { _ in
-            let query = entry.text.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+            let cleaned = entry.text.replace(regex: "#(\\w+\\s?)", with: "")
+            let query = cleaned.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
             let url = URL(string: "https://google.com/search?q=\(query)")!
             let controller = SFSafariViewController(url: url)
             self.present(controller, animated: true, completion: nil)
@@ -136,8 +137,6 @@ class EntriesTableVC: UIViewController {
 
     override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
         guard motion == .motionShake else { return }
-
-        //let url = URL(string: "http://google.com")!
 
         let dir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
         let file = dir.appendingPathComponent("data.logger")
