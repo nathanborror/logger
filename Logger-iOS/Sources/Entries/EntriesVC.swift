@@ -106,10 +106,8 @@ class EntriesTableVC: UIViewController {
     }
 
     func handleHashtag(_ tag: String) {
-        var query = tag
-        query.removeFirst(3)
-        composer.query = query
-        try! Kit.entrySearch(query)
+        composer.query = tag
+        try! Kit.entrySearch(tag)
     }
 
     func handleLink(_ url: URL) {
