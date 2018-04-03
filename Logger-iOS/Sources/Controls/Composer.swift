@@ -45,19 +45,23 @@ class Composer: UIControl {
         super.init(frame: .zero)
 
         autoresizingMask = [.flexibleHeight]
-        backgroundColor = UIColor(white: 0.9, alpha: 1)
+        backgroundColor = .white
 
         contentView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(contentView)
 
         textView.delegate = self
         textView.font = .preferredFont(forTextStyle: .body)
-        textView.layer.cornerRadius = 8
+        textView.layer.cornerRadius = 19
+        textView.layer.borderColor = UIColor(white: 0.85, alpha: 1).cgColor
+        textView.layer.borderWidth = 1 / UIScreen.main.scale
         textView.isScrollEnabled = false
-        textView.textContainerInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+        textView.textContainerInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
         textView.textContainer.lineFragmentPadding = 0
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.returnKeyType = .send
+        textView.backgroundColor = UIColor(white: 0.98, alpha: 1)
+        textView.tintColor = .black
         contentView.addSubview(textView)
 
         searchIcon.image = .iconSearch
@@ -87,8 +91,8 @@ class Composer: UIControl {
             textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: insets.left),
             textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -insets.right),
 
-            searchIcon.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -(insets.bottom + 8)),
-            searchIcon.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: (insets.left + 6)),
+            searchIcon.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -(insets.bottom + 7)),
+            searchIcon.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: (insets.left + 8)),
             searchIcon.widthAnchor.constraint(equalToConstant: 24),
             searchIcon.heightAnchor.constraint(equalToConstant: 24),
 
@@ -149,7 +153,7 @@ class Composer: UIControl {
         searchIcon.isHidden = false
         clearButton.isHidden = false
         var textInsets = textView.textContainerInset
-        textInsets.left += 32
+        textInsets.left += 18
         textView.textContainerInset = textInsets
     }
 
@@ -160,7 +164,7 @@ class Composer: UIControl {
         searchIcon.isHidden = true
         clearButton.isHidden = true
         var textInsets = textView.textContainerInset
-        textInsets.left -= 32
+        textInsets.left -= 18
         textView.textContainerInset = textInsets
 
         // TODO: Figure out exactly why this is necessary

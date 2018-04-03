@@ -10,6 +10,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                      willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.backgroundColor = .white
+        window?.tintColor = .black
         window?.rootViewController = EntriesVC()
         window?.makeKeyAndVisible()
         return true
