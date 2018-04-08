@@ -55,7 +55,7 @@ class Composer: UIControl {
         textView.delegate = self
         textView.font = .preferredFont(forTextStyle: .body)
         textView.layer.cornerRadius = 19
-        textView.layer.borderColor = UIColor(white: 0.85, alpha: 1).cgColor
+        textView.layer.borderColor = UIColor(white: 0.7, alpha: 1).cgColor
         textView.layer.borderWidth = 1 / UIScreen.main.scale
         textView.isScrollEnabled = false
         textView.textContainerInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
