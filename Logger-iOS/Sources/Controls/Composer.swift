@@ -32,12 +32,14 @@ class Composer: UIControl {
 
     var placeholder = "Type Something..."
     var placeholderColor = UIColor.lightGray
+
     var isPlaceholding = true
+    var isSearching: Bool { return !searchIcon.isHidden }
 
     let contentView = UIView()
     let textView = UITextView()
     let searchIcon = UIImageView()
-    let clearButton = UIButton()
+    let primaryButton = PrimaryButton()
 
     var textViewHeightAnchor: NSLayoutConstraint!
 
@@ -59,7 +61,7 @@ class Composer: UIControl {
         textView.textContainerInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
         textView.textContainer.lineFragmentPadding = 0
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.returnKeyType = .send
+        textView.keyboardType = .twitter
         textView.backgroundColor = UIColor(white: 0.98, alpha: 1)
         textView.tintColor = .black
         contentView.addSubview(textView)
@@ -71,12 +73,10 @@ class Composer: UIControl {
         searchIcon.isHidden = true
         contentView.addSubview(searchIcon)
 
-        clearButton.setImage(.iconClear, for: .normal)
-        clearButton.tintColor = .lightGray
-        clearButton.isHidden = true
-        clearButton.addTarget(self, action: #selector(handleClearSearch), for: .touchUpInside)
-        clearButton.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(clearButton)
+        primaryButton.stage = .photo
+        primaryButton.addTarget(self, action: #selector(handlePrimaryTapped), for: .primaryActionTriggered)
+        primaryButton.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(primaryButton)
 
         textViewHeightAnchor = textView.heightAnchor.constraint(equalToConstant: 96)
 
@@ -96,10 +96,10 @@ class Composer: UIControl {
             searchIcon.widthAnchor.constraint(equalToConstant: 24),
             searchIcon.heightAnchor.constraint(equalToConstant: 24),
 
-            clearButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -(insets.bottom - 3)),
-            clearButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
-            clearButton.widthAnchor.constraint(equalToConstant: 44),
-            clearButton.heightAnchor.constraint(equalToConstant: 44),
+            primaryButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -(insets.bottom + 5)),
+            primaryButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -13),
+            primaryButton.widthAnchor.constraint(equalToConstant: 28),
+            primaryButton.heightAnchor.constraint(equalToConstant: 28),
         ])
 
         reload()
@@ -117,6 +117,20 @@ class Composer: UIControl {
         placeholderOn()
     }
 
+    @objc private func handlePrimaryTapped() {
+        switch primaryButton.stage {
+        case .send:
+            sendActions(for: .primaryActionTriggered)
+        case .photo:
+            sendActions(for: .photoPickerShouldShow)
+        case .clear:
+            reload()
+            searchModeOff()
+        case .none:
+            break
+        }
+    }
+
     // MARK: - Placeholder
 
     private func placeholderOff(with value: String = "") {
@@ -127,6 +141,8 @@ class Composer: UIControl {
 
         textView.text = value
         textView.textColor = .black
+
+        primaryButton.stage = isSearching ? .clear : .send
     }
 
     private func placeholderOn() {
@@ -137,24 +153,22 @@ class Composer: UIControl {
         // Must be set after setting the text view text otherwise it
         // will cause an infinite loop with textViewDidChangeSelection().
         isPlaceholding = true
+
+        primaryButton.stage = isSearching ? .clear : .photo
     }
 
     // MARK: - Search
-
-    @objc private func handleClearSearch() {
-        reload()
-        searchModeOff()
-    }
 
     private func searchModeOn() {
         guard searchIcon.isHidden else {
             return
         }
         searchIcon.isHidden = false
-        clearButton.isHidden = false
         var textInsets = textView.textContainerInset
         textInsets.left += 18
         textView.textContainerInset = textInsets
+
+        primaryButton.stage = .clear
     }
 
     private func searchModeOff() {
@@ -162,13 +176,14 @@ class Composer: UIControl {
             return
         }
         searchIcon.isHidden = true
-        clearButton.isHidden = true
         var textInsets = textView.textContainerInset
         textInsets.left -= 18
         textView.textContainerInset = textInsets
 
         // TODO: Figure out exactly why this is necessary
         searchQueryChanged()
+
+        primaryButton.stage = .photo
     }
 
     private func searchQueryChanged() {
@@ -179,9 +194,6 @@ class Composer: UIControl {
 extension Composer: UITextViewDelegate {
 
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-
-        // Return early and submit on newline character
-        guard text != "\n" else { sendActions(for: .primaryActionTriggered); return false }
 
         // Show Search Mode when first character is a space character
         if text == " " && range.length == 0 && range.location == 0 { searchModeOn(); return false }
@@ -241,5 +253,69 @@ extension Composer: UITextViewDelegate {
 
     func textViewDidEndEditing(_ textView: UITextView) {
         sendActions(for: .editingDidEnd)
+    }
+}
+
+class PrimaryButton: UIControl {
+
+    enum Stage {
+        case send
+        case photo
+        case clear
+        case none
+    }
+
+    var stage: Stage = .none { didSet{ stageDidSet() }}
+
+    private let background = CALayer()
+
+    convenience init() {
+        self.init(frame: .zero)
+
+        background.frame = bounds
+        background.backgroundColor = UIColor.systemBlue.cgColor
+        layer.addSublayer(background)
+
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleTapped))
+        addGestureRecognizer(tap)
+    }
+
+    override func layoutSubviews() {
+        animateBackground()
+    }
+
+    override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
+        let frame = bounds.insetBy(dx: -20, dy: -20)
+        return frame.contains(point)
+    }
+
+    @objc func handleTapped() {
+        sendActions(for: .primaryActionTriggered)
+    }
+
+    func stageDidSet() {
+        animateBackground()
+    }
+
+    func animateBackground() {
+        switch stage {
+        case .send:
+            background.backgroundColor = UIColor.systemBlue.cgColor
+            background.frame = bounds
+            background.contents = UIImage.iconArrowUp.cgImage
+        case .photo:
+            background.backgroundColor = UIColor(hex: 0x8E8E93).cgColor
+            background.frame = bounds
+            background.contents = UIImage.iconCamera.cgImage
+        case .clear:
+            background.backgroundColor = UIColor(hex: 0x8E8E93).cgColor
+            background.frame = bounds.insetBy(dx: 7, dy: 7)
+            background.contents = UIImage.iconClear.cgImage
+        case .none:
+            background.backgroundColor = UIColor.clear.cgColor
+            background.frame = bounds
+            background.contents = nil
+        }
+        background.cornerRadius = background.frame.height / 2
     }
 }
