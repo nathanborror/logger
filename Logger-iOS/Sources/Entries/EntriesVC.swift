@@ -42,6 +42,7 @@ class EntriesTableVC: UIViewController {
         composer.addTarget(self, action: #selector(handleSendHit), for: .primaryActionTriggered)
         composer.addTarget(self, action: #selector(handleSearchChange), for: .searchQueryChanged)
         composer.addTarget(self, action: #selector(handleComposerFocus), for: .editingDidBegin)
+        composer.addTarget(self, action: #selector(handlePhotoPicker), for: .photoPickerShouldShow)
 
         // Provides secondary actions for entries
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
@@ -86,11 +87,17 @@ class EntriesTableVC: UIViewController {
     @objc func handleSendHit() {
         guard let text = composer.text else { return }
         do {
-            try Kit.entryCreate(text)
+            try Kit.entryCreate(text: text)
         } catch {
             print(error)
         }
         composer.reload()
+    }
+
+    @objc func handlePhotoPicker() {
+        let vc = UIImagePickerController()
+        vc.delegate = self
+        present(vc, animated: true, completion: nil)
     }
 
     @objc func handleSearchChange(_ sender: Composer) {
@@ -121,7 +128,7 @@ class EntriesTableVC: UIViewController {
         vc.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         vc.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
             do {
-                try Kit.entryDelete(entry: entry.id)
+                try Kit.entryDelete(entry: entry)
             } catch {
                 print(error)
             }
@@ -179,6 +186,15 @@ extension EntriesTableVC: UITableViewDataSource, UITableViewDelegate {
         cell.onHashtagTap = { [weak self] tag in self?.handleHashtag(tag) }
         cell.onLinkTap = { [weak self] url in self?.handleLink(url) }
         return cell
+    }
+}
+
+extension EntriesTableVC: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        guard let imageURL = info[UIImagePickerControllerImageURL] as? URL else { return }
+        try! Kit.entryCreate(url: imageURL)
+        picker.dismiss(animated: true, completion: nil)
     }
 }
 

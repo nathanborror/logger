@@ -1,8 +1,8 @@
-import UIKit
+import Foundation
 
 extension String {
 
-    func replace(regex: String, with replace: String) -> String {
+    public func replace(regex: String, with replace: String) -> String {
         do {
             let regex = try NSRegularExpression(pattern: regex)
             let range = NSRange(self.startIndex..., in: self)
@@ -13,7 +13,7 @@ extension String {
         }
     }
 
-    func match(regex: String) -> [String] {
+    public func match(regex: String) -> [String] {
         do {
             let regex = try NSRegularExpression(pattern: regex)
             let range = NSRange(self.startIndex..., in: self)
@@ -25,7 +25,7 @@ extension String {
         }
     }
 
-    func trim(to max: Int) -> String {
+    public func trim(to max: Int) -> String {
         return "\(self[..<index(startIndex, offsetBy: max)])" + "..."
     }
 }

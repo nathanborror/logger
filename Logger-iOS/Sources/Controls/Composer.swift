@@ -2,6 +2,7 @@ import UIKit
 
 extension UIControlEvents {
     static var searchQueryChanged: UIControlEvents = [.valueChanged]
+    static var photoPickerShouldShow: UIControlEvents = [.applicationReserved]
 }
 
 class Composer: UIControl {

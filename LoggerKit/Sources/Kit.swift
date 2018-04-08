@@ -5,6 +5,15 @@ var defaultDatabaseURL: URL {
     return dir.appendingPathComponent("data.logger")
 }
 
+var defaultPhotosURL: URL {
+    var dir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+    dir.appendPathComponent("Photos", isDirectory: true)
+    if FileManager.default.fileExists(atPath: dir.path) == false {
+        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    }
+    return dir
+}
+
 public class Kit {
 
     public static let StateDidChange = Notification.Name("KitStateDidChange")
