@@ -124,6 +124,11 @@ class EntriesTableVC: UIViewController {
         present(controller, animated: true, completion: nil)
     }
 
+    func handlePhoto(_ image: UIImage) {
+        let controller = UINavigationController(rootViewController: EntryPhotoVC(image: image))
+        present(controller, animated: true, completion: nil)
+    }
+
     func showActions(for entry: Entry) {
         let vc = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         vc.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -186,6 +191,7 @@ extension EntriesTableVC: UITableViewDataSource, UITableViewDelegate {
         cell.configure(with: entry)
         cell.onHashtagTap = { [weak self] tag in self?.handleHashtag(tag) }
         cell.onLinkTap = { [weak self] url in self?.handleLink(url) }
+        cell.onEntryPhotoTap = { [weak self] image in self?.handlePhoto(image) }
         return cell
     }
 }

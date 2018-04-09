@@ -7,10 +7,12 @@ class EntryCell: UITableViewCell {
     var contentInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
     var onHashtagTap: ((String) -> Void)?
     var onLinkTap: ((URL) -> Void)?
+    var onEntryPhotoTap: ((UIImage) -> Void)?
 
     private let additionalHeight: CGFloat = 2 // TODO: Figure out why ActiveLabel needs this
     private let gapHeight: CGFloat = 2
     private var isImage = false
+    private var entry: Entry? = nil { didSet { entryDidSet() }}
     
     lazy var entryView: UILabel = {
         let view = ActiveLabel()
@@ -28,25 +30,38 @@ class EntryCell: UITableViewCell {
         }
         view.backgroundColor = .entryBackground
         view.tintColor = .entryTint
-        self.contentView.addSubview(view)
+        contentView.addSubview(view)
         return view
     }()
 
-    lazy var entryPhoto: UIImageView = {
-        let view = UIImageView()
+    lazy var entryPhoto: UIButton = {
+        let view = UIButton()
         view.backgroundColor = .entryBackground
         view.layer.cornerRadius = 19
         view.clipsToBounds = true
-        view.contentMode = .scaleAspectFill
+        view.imageView?.contentMode = .scaleAspectFill
+        view.addTarget(self, action: #selector(handleEntryPhotoTap), for: .touchUpInside)
         contentView.addSubview(view)
         return view
     }()
 
     func configure(with entry: Entry) {
+        self.entry = entry
+    }
+
+    func entryDidSet() {
+        guard let entry = entry else {
+            entryView.text = nil
+            entryView.isHidden = false
+            entryPhoto.isHidden = true
+            entryPhoto.setImage(nil, for: .normal)
+            isImage = false
+            return
+        }
         if let data = Kit.openEntry(entry) {
             contentView.backgroundColor = .clear
             contentView.layer.cornerRadius = 0
-            entryPhoto.image = UIImage(data: data)
+            entryPhoto.setImage(UIImage(data: data), for: .normal)
             entryPhoto.isHidden = false
             entryView.isHidden = true
             isImage = true
@@ -58,6 +73,11 @@ class EntryCell: UITableViewCell {
             entryView.text = entry.text
             isImage = false
         }
+    }
+
+    @objc func handleEntryPhotoTap() {
+        guard let image = entryPhoto.imageView?.image else { return }
+        onEntryPhotoTap?(image)
     }
 
     override func sizeThatFits(_ size: CGSize) -> CGSize {
@@ -84,15 +104,12 @@ class EntryCell: UITableViewCell {
 
         if isImage {
             entryPhoto.frame = CGRect(origin: .zero, size: imageSize)
+            contentView.frame = CGRect(origin: separatorInset.origin, size: imageSize)
         }
     }
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        entryView.text = nil
-        entryView.isHidden = false
-        entryPhoto.isHidden = true
-        entryPhoto.image = nil
-        isImage = false
+        entry = nil
     }
 }
