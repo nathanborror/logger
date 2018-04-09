@@ -27,6 +27,8 @@ class EntryPhotoVC: UIViewController {
         scrollView.addSubview(imageView)
 
         scrollView.delegate = self
+        scrollView.alwaysBounceHorizontal = true
+        scrollView.alwaysBounceVertical = true
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scrollView)
 
