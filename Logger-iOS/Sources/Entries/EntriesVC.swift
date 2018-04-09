@@ -95,6 +95,7 @@ class EntriesTableVC: UIViewController {
     }
 
     @objc func handlePhotoPicker() {
+        composer.textView.resignFirstResponder()
         let vc = UIImagePickerController()
         vc.delegate = self
         present(vc, animated: true, completion: nil)
