@@ -1,6 +1,10 @@
 all:
 	XcodeGen
 
+clean:
+	rm -rf Logger.xcodeproj/project.xcworkspace/xcuserdata
+	rm -rf Logger.xcodeproj/xcuserdata
+
 profile:
 	xcodebuild -destination 'platform=iOS Simulator,name=iPhone X' \
   		-sdk iphonesimulator -project Logger.xcodeproj \
