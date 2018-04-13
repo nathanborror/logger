@@ -1,13 +1,33 @@
 import UIKit
 
-extension UIControlEvents {
-    static var searchQueryChanged: UIControlEvents = [.valueChanged]
-    static var photoPickerShouldShow: UIControlEvents = [.applicationReserved]
+protocol ComposerDelegate: class {
+    func composerDidBeginEditing(_ composer: Composer)
+    func composerDidEndEditing(_ composer: Composer)
+    func composerDidSubmit(_ composer: Composer)
+
+    func composerSearchDidBegin(_ composer: Composer)
+    func composerSearchDidEnd(_ composer: Composer)
+    func composerSearchDidChange(_ composer: Composer)
+
+    func composerPhotoPickerShouldShow(_ composer: Composer)
+}
+
+extension ComposerDelegate {
+    func composerDidBeginEditing(_ composer: Composer) {}
+    func composerDidEndEditing(_ composer: Composer) {}
+    func composerDidSubmit(_ composer: Composer) {}
+
+    func composerSearchDidBegin(_ composer: Composer) {}
+    func composerSearchDidEnd(_ composer: Composer) {}
+    func composerSearchDidChange(_ composer: Composer) {}
+
+    func composerPhotoPickerShouldShow(_ composer: Composer) {}
 }
 
 class Composer: UIControl {
 
     var insets: UIEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+    weak var delegate: ComposerDelegate?
 
     var text: String? {
         guard isPlaceholding != true else { return nil }
@@ -121,9 +141,9 @@ class Composer: UIControl {
     @objc private func handlePrimaryTapped() {
         switch primaryButton.stage {
         case .send:
-            sendActions(for: .primaryActionTriggered)
+            delegate?.composerDidSubmit(self)
         case .photo:
-            sendActions(for: .photoPickerShouldShow)
+            delegate?.composerPhotoPickerShouldShow(self)
         case .clear:
             reload()
             searchModeOff()
@@ -168,8 +188,8 @@ class Composer: UIControl {
         var textInsets = textView.textContainerInset
         textInsets.left += 18
         textView.textContainerInset = textInsets
-
         primaryButton.stage = .clear
+        delegate?.composerSearchDidBegin(self)
     }
 
     private func searchModeOff() {
@@ -185,10 +205,11 @@ class Composer: UIControl {
         searchQueryChanged()
 
         primaryButton.stage = .photo
+        delegate?.composerSearchDidEnd(self)
     }
 
     private func searchQueryChanged() {
-        sendActions(for: .searchQueryChanged)
+        delegate?.composerSearchDidChange(self)
     }
 }
 
@@ -249,11 +270,11 @@ extension Composer: UITextViewDelegate {
     }
 
     func textViewDidBeginEditing(_ textView: UITextView) {
-        sendActions(for: .editingDidBegin)
+        delegate?.composerDidBeginEditing(self)
     }
 
     func textViewDidEndEditing(_ textView: UITextView) {
-        sendActions(for: .editingDidEnd)
+        delegate?.composerDidEndEditing(self)
     }
 }
 

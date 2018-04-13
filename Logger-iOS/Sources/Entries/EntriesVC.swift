@@ -15,7 +15,6 @@ class EntriesTableVC: UIViewController {
     private var model = EntriesModel()
     private var tableView = UITableView()
     private var composer = Composer()
-    private var initialSafeAreaInsets: UIEdgeInsets = .zero
 
     override var inputAccessoryView: UIView? {
         return composer
@@ -28,6 +27,8 @@ class EntriesTableVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        composer.delegate = self
+
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(EntryCell.self, forCellReuseIdentifier: "EntryCell")
@@ -35,29 +36,21 @@ class EntriesTableVC: UIViewController {
         tableView.separatorStyle = .none
         tableView.allowsSelection = false
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 16)
-        tableView.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 16, right: 0)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
 
-        composer.addTarget(self, action: #selector(handleSendHit), for: .primaryActionTriggered)
-        composer.addTarget(self, action: #selector(handleSearchChange), for: .searchQueryChanged)
-        composer.addTarget(self, action: #selector(handleComposerFocus), for: .editingDidBegin)
-        composer.addTarget(self, action: #selector(handlePhotoPicker), for: .photoPickerShouldShow)
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+        ])
 
         // Provides secondary actions for entries
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
         tableView.addGestureRecognizer(longPress)
 
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            tableView.contentLayoutGuide.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-        ])
-
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: .UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: .UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidChange), name: .UIKeyboardDidChangeFrame, object: nil)
 
         Kit.observe(self, selector: #selector(stateChange))
     }
@@ -70,7 +63,6 @@ class EntriesTableVC: UIViewController {
         }
         if model.applySearch(state) {
             tableView.reloadData()
-            scrollToBottom(animated: true)
         }
     }
 
@@ -80,30 +72,7 @@ class EntriesTableVC: UIViewController {
         tableView.scrollToRow(at: indexPath, at: .bottom, animated: animated)
     }
 
-    @objc func handleComposerFocus() {
-        scrollToBottom(animated: true)
-    }
-
-    @objc func handleSendHit() {
-        guard let text = composer.text else { return }
-        do {
-            try Kit.entryCreate(text: text)
-        } catch {
-            print(error)
-        }
-        composer.reload()
-    }
-
-    @objc func handlePhotoPicker() {
-        composer.textView.resignFirstResponder()
-        let vc = UIImagePickerController()
-        vc.delegate = self
-        present(vc, animated: true, completion: nil)
-    }
-
-    @objc func handleSearchChange(_ sender: Composer) {
-        try! Kit.entrySearch(sender.query)
-    }
+    // MARK: - Handlers
 
     @objc func handleLongPress(recognizer: UILongPressGestureRecognizer) {
         let point = recognizer.location(in: tableView)
@@ -133,11 +102,7 @@ class EntriesTableVC: UIViewController {
         let vc = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         vc.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         vc.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
-            do {
-                try Kit.entryDelete(entry: entry)
-            } catch {
-                print(error)
-            }
+            try! Kit.entryDelete(entry: entry)
         })
         vc.addAction(UIAlertAction(title: "Google", style: .default) { _ in
             let cleaned = entry.text.replace(regex: "#(\\w+\\s?)", with: "")
@@ -148,6 +113,8 @@ class EntriesTableVC: UIViewController {
         })
         present(vc, animated: true, completion: nil)
     }
+
+    // MARK: - Export
 
     override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
         guard motion == .motionShake else { return }
@@ -161,19 +128,17 @@ class EntriesTableVC: UIViewController {
 
     // MARK: - Keyboard
 
-    @objc func keyboardWillShow(notification: Notification) {
-        guard let userInfo = notification.userInfo else { return }
-        guard let endFrameValue = userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue else { return }
+    @objc func keyboardDidChange(notification: Notification) {
+        guard let info = notification.userInfo else { return }
+        guard let endFrameValue = info[UIKeyboardFrameEndUserInfoKey] as? NSValue else { return }
 
-        // Reset safe area insets
-        additionalSafeAreaInsets = .zero
+        let keyboardSize = endFrameValue.cgRectValue.size
+        let contentInsets = UIEdgeInsets(top: 0, left: 0, bottom: keyboardSize.height - view.safeAreaInsets.bottom, right: 0)
 
-        // Apply new additional safe area insets, accounting for keyboard height
-        let additionalHeight = endFrameValue.cgRectValue.size.height - view.safeAreaInsets.bottom
-        additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: additionalHeight, right: 0)
-    }
+        tableView.contentInset = contentInsets
+        tableView.scrollIndicatorInsets = contentInsets
 
-    @objc func keyboardWillHide(notification: Notification) {
+        scrollToBottom(animated: true)
     }
 }
 
@@ -184,15 +149,41 @@ extension EntriesTableVC: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "EntryCell", for: indexPath) as? EntryCell else {
-            fatalError("Unknown cell")
-        }
         let entry = model.entries[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "EntryCell", for: indexPath) as! EntryCell
         cell.configure(with: entry)
         cell.onHashtagTap = { [weak self] tag in self?.handleHashtag(tag) }
         cell.onLinkTap = { [weak self] url in self?.handleLink(url) }
         cell.onEntryPhotoTap = { [weak self] image in self?.handlePhoto(image) }
         return cell
+    }
+}
+
+extension EntriesTableVC: ComposerDelegate {
+
+    func composerDidSubmit(_ composer: Composer) {
+        guard let text = composer.text else { return }
+        try! Kit.entryCreate(text: text)
+        composer.reload()
+    }
+
+    func composerDidBeginEditing(_ composer: Composer) {
+        scrollToBottom(animated: true)
+    }
+
+    func composerSearchDidChange(_ composer: Composer) {
+        try! Kit.entrySearch(composer.query)
+    }
+
+    func composerSearchDidEnd(_ composer: Composer) {
+        scrollToBottom(animated: true)
+    }
+
+    func composerPhotoPickerShouldShow(_ composer: Composer) {
+        composer.textView.resignFirstResponder()
+        let vc = UIImagePickerController()
+        vc.delegate = self
+        present(vc, animated: true, completion: nil)
     }
 }
 
