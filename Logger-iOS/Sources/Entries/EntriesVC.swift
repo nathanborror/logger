@@ -37,6 +37,7 @@ class EntriesTableVC: UIViewController {
         tableView.allowsSelection = false
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 16)
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.transform = CGAffineTransform(scaleX: 1, y: -1)
         view.addSubview(tableView)
 
         NSLayoutConstraint.activate([
@@ -57,28 +58,27 @@ class EntriesTableVC: UIViewController {
 
     @objc func stateChange() {
         let state = Kit.state
+        let priorEntries = model.entries
         if model.applyEntries(state) {
-            tableView.reloadData()
-            scrollToBottom(animated: true)
+            guard priorEntries.count > 0 else {
+                tableView.reloadData()
+                tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                return
+            }
+            tableView.applyDiff(prior: priorEntries, section: 0, animation: .top) {
+                return model.entries
+            }
         }
         if model.applySearch(state) {
             tableView.reloadData()
         }
     }
 
-    func scrollToBottom(animated: Bool) {
-        guard model.entries.count > 0 else { return }
-        let indexPath = IndexPath(row: model.entries.count - 1, section: 0)
-        tableView.scrollToRow(at: indexPath, at: .bottom, animated: animated)
-    }
-
     // MARK: - Handlers
 
     @objc func handleLongPress(recognizer: UILongPressGestureRecognizer) {
         let point = recognizer.location(in: tableView)
-        guard let indexPath = tableView.indexPathForRow(at: point) else {
-            return
-        }
+        guard let indexPath = tableView.indexPathForRow(at: point) else { return }
         let entry = model.entries[indexPath.row]
         showActions(for: entry)
     }
@@ -129,16 +129,21 @@ class EntriesTableVC: UIViewController {
     // MARK: - Keyboard
 
     @objc func keyboardDidChange(notification: Notification) {
-        guard let info = notification.userInfo else { return }
-        guard let endFrameValue = info[UIKeyboardFrameEndUserInfoKey] as? NSValue else { return }
+        guard let endFrameValue = notification.keyboardFrameEnd else { return }
+        guard let animationDuration = notification.keyboardAnimationDuration else { return }
+        guard let animationOptions = notification.keyboardAnimationOptions else { return }
 
-        let keyboardSize = endFrameValue.cgRectValue.size
-        let contentInsets = UIEdgeInsets(top: 0, left: 0, bottom: keyboardSize.height - view.safeAreaInsets.bottom, right: 0)
+        let keyboardSize = endFrameValue.size
+        let contentInsets = UIEdgeInsets(top: keyboardSize.height - view.safeAreaInsets.bottom, left: 0, bottom: 0, right: 0)
 
-        tableView.contentInset = contentInsets
-        tableView.scrollIndicatorInsets = contentInsets
+        var contentOffset = tableView.contentOffset
+        contentOffset.y = -contentInsets.top
 
-        scrollToBottom(animated: true)
+        UIView.animate(withDuration: animationDuration, delay: 0, options: animationOptions, animations: {
+            self.tableView.contentInset = contentInsets
+            self.tableView.scrollIndicatorInsets = contentInsets
+            self.tableView.contentOffset = contentOffset
+        }, completion: nil)
     }
 }
 
@@ -151,6 +156,7 @@ extension EntriesTableVC: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let entry = model.entries[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "EntryCell", for: indexPath) as! EntryCell
+        cell.contentView.transform = CGAffineTransform(scaleX: 1, y: -1)
         cell.configure(with: entry)
         cell.onHashtagTap = { [weak self] tag in self?.handleHashtag(tag) }
         cell.onLinkTap = { [weak self] url in self?.handleLink(url) }
@@ -167,16 +173,8 @@ extension EntriesTableVC: ComposerDelegate {
         composer.reload()
     }
 
-    func composerDidBeginEditing(_ composer: Composer) {
-        scrollToBottom(animated: true)
-    }
-
     func composerSearchDidChange(_ composer: Composer) {
         try! Kit.entrySearch(composer.query)
-    }
-
-    func composerSearchDidEnd(_ composer: Composer) {
-        scrollToBottom(animated: true)
     }
 
     func composerPhotoPickerShouldShow(_ composer: Composer) {
@@ -220,7 +218,7 @@ struct EntriesModel {
         if ids.count > 0 {
             return ids.map { entries[$0] }.compactMap { $0 }
         } else {
-            return Array(entries.values).sorted { $0.created < $1.created }
+            return Array(entries.values).sorted { $0.created > $1.created }
         }
     }
 }
