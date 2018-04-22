@@ -10,7 +10,7 @@ class EntryCell: UITableViewCell {
     var onEntryPhotoTap: ((UIImage) -> Void)?
 
     private let additionalHeight: CGFloat = 2 // TODO: Figure out why ActiveLabel needs this
-    private let gapHeight: CGFloat = 2
+    private let gapHeight: CGFloat = 1
     private var isImage = false
     private var entry: Entry? = nil { didSet { entryDidSet() }}
     
@@ -97,7 +97,7 @@ class EntryCell: UITableViewCell {
         let insets = separatorInset + contentInset
 
         let entryFit = contentView.bounds.size.insetBy(insets)
-        let entrySize = entryView.sizeThatFits(entryFit) + CGSize(width: 0, height: gapHeight)
+        let entrySize = entryView.sizeThatFits(entryFit) + CGSize(width: 0, height: additionalHeight)
         entryView.frame = CGRect(origin: contentInset.origin, size: entrySize)
 
         let contentSize = entrySize.outsetBy(contentInset)
