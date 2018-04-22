@@ -38,6 +38,7 @@ class EntriesTableVC: UIViewController {
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 16)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.transform = CGAffineTransform(scaleX: 1, y: -1)
+        tableView.backgroundColor = .background
         view.addSubview(tableView)
 
         NSLayoutConstraint.activate([

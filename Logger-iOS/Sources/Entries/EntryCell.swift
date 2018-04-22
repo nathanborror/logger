@@ -46,6 +46,7 @@ class EntryCell: UITableViewCell {
     }()
 
     func configure(with entry: Entry) {
+        backgroundColor = .background
         self.entry = entry
     }
 
