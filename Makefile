@@ -23,3 +23,4 @@ profile-log:
 		sed -e "s|$(pwd)/||" | \
 		sort -rn | \
 		tee slowest.log
+
