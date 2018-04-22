@@ -61,13 +61,15 @@ class EntriesTableVC: UIViewController {
         let state = Kit.state
         let priorEntries = model.entries
         if model.applyEntries(state) {
-            guard priorEntries.count > 0 else {
+            if priorEntries.count > 0 {
+                tableView.applyDiff(prior: priorEntries, section: 0, animation: .top) {
+                    return model.entries
+                }
+            } else {
                 tableView.reloadData()
-                tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-                return
-            }
-            tableView.applyDiff(prior: priorEntries, section: 0, animation: .top) {
-                return model.entries
+                if model.entries.count > 0 {
+                    tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                }
             }
         }
         if model.applySearch(state) {
