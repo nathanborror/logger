@@ -51,7 +51,7 @@ class Composer: UIControl {
         }
     }
 
-    var placeholder = "Type Something..."
+    var placeholder = "Message"
     var placeholderColor = UIColor.lightGray
 
     var isPlaceholding = true
@@ -68,7 +68,7 @@ class Composer: UIControl {
         super.init(frame: .zero)
 
         autoresizingMask = [.flexibleHeight]
-        backgroundColor = .white
+        backgroundColor = .background
 
         contentView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(contentView)
@@ -83,12 +83,12 @@ class Composer: UIControl {
         textView.textContainer.lineFragmentPadding = 0
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.keyboardType = .twitter
-        textView.backgroundColor = UIColor(white: 0.98, alpha: 1)
+        textView.backgroundColor = .white
         textView.tintColor = .black
         contentView.addSubview(textView)
 
         searchIcon.image = .iconSearch
-        searchIcon.tintColor = .black
+        searchIcon.tintColor = .systemGray
         searchIcon.layer.cornerRadius = 6
         searchIcon.translatesAutoresizingMaskIntoConstraints = false
         searchIcon.isHidden = true
@@ -167,7 +167,7 @@ class Composer: UIControl {
     }
 
     private func placeholderOn() {
-        textView.text = placeholder
+        textView.text = isSearching ? "Search" : placeholder
         textView.textColor = placeholderColor
         textView.selectedTextRange = textView.textRange(from: textView.beginningOfDocument, to: textView.beginningOfDocument)
 
@@ -189,6 +189,7 @@ class Composer: UIControl {
         textInsets.left += 18
         textView.textContainerInset = textInsets
         primaryButton.stage = .clear
+        textView.text = "Search"
         delegate?.composerSearchDidBegin(self)
     }
 
@@ -205,6 +206,7 @@ class Composer: UIControl {
         searchQueryChanged()
 
         primaryButton.stage = .photo
+        textView.text = placeholder
         delegate?.composerSearchDidEnd(self)
     }
 
@@ -235,7 +237,7 @@ extension Composer: UITextViewDelegate {
         }
 
         // Prepare text view for a value
-        if textView.text == placeholder && !text.isEmpty {
+        if textView.text == (isSearching ? "Search" : placeholder) && !text.isEmpty {
             placeholderOff(with: "")
         }
         return true
@@ -326,11 +328,11 @@ class PrimaryButton: UIControl {
             background.frame = bounds
             background.contents = UIImage.iconArrowUp.cgImage
         case .photo:
-            background.backgroundColor = UIColor(hex: 0x8E8E93).cgColor
+            background.backgroundColor = UIColor.systemGray.cgColor
             background.frame = bounds
             background.contents = UIImage.iconCamera.cgImage
         case .clear:
-            background.backgroundColor = UIColor(hex: 0x8E8E93).cgColor
+            background.backgroundColor = UIColor.systemGray.cgColor
             background.frame = bounds.insetBy(dx: 7, dy: 7)
             background.contents = UIImage.iconClear.cgImage
         case .none:
