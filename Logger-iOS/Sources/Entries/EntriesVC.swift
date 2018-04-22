@@ -1,6 +1,5 @@
 import UIKit
 import LoggerKit
-import SafariServices
 
 class EntriesVC: UINavigationController {
 
@@ -82,8 +81,16 @@ class EntriesTableVC: UIViewController {
     @objc func handleLongPress(recognizer: UILongPressGestureRecognizer) {
         let point = recognizer.location(in: tableView)
         guard let indexPath = tableView.indexPathForRow(at: point) else { return }
+        guard let cell = tableView.cellForRow(at: indexPath) as? EntryCell else { return }
         let entry = model.entries[indexPath.row]
-        showActions(for: entry)
+        let cellFrame = cell.convert(cell.contentView.frame, to: view)
+
+        let vc = MenuVC(entry: entry)
+        vc.transitioningDelegate = vc
+        vc.preferredContentSize = CGSize(width: 160, height: 54)
+        vc.sourceRect = cellFrame
+        vc.modalPresentationStyle = .custom
+        presentOverKeyboard(vc, animated: true, completion: nil)
     }
 
     func handleHashtag(_ tag: String) {
@@ -92,28 +99,11 @@ class EntriesTableVC: UIViewController {
     }
 
     func handleLink(_ url: URL) {
-        let controller = SFSafariViewController(url: url)
-        present(controller, animated: true, completion: nil)
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
 
     func handlePhoto(_ image: UIImage) {
-        let controller = UINavigationController(rootViewController: EntryPhotoVC(image: image))
-        present(controller, animated: true, completion: nil)
-    }
-
-    func showActions(for entry: Entry) {
-        let vc = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        vc.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        vc.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
-            try! Kit.entryDelete(entry: entry)
-        })
-        vc.addAction(UIAlertAction(title: "Google", style: .default) { _ in
-            let cleaned = entry.text.replace(regex: "#(\\w+\\s?)", with: "")
-            let query = cleaned.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-            let url = URL(string: "https://google.com/search?q=\(query)")!
-            let controller = SFSafariViewController(url: url)
-            self.present(controller, animated: true, completion: nil)
-        })
+        let vc = UINavigationController(rootViewController: EntryPhotoVC(image: image))
         present(vc, animated: true, completion: nil)
     }
 
