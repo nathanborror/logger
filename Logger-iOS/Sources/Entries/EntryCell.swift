@@ -59,7 +59,7 @@ class EntryCell: UITableViewCell {
             isImage = false
             return
         }
-        if let data = Kit.openEntry(entry) {
+        if let imageURL = entry.image, let data = try? Data(contentsOf: imageURL) {
             contentView.backgroundColor = .clear
             contentView.layer.cornerRadius = 0
             entryPhoto.setImage(UIImage(data: data), for: .normal)

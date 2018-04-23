@@ -24,6 +24,7 @@ public struct Search: Equatable {
 public struct Entry: Equatable, Hashable {
     public var id: Int
     public var text: String
+    public var image: URL?
     public var color: Int
     public var created: Date
     public var modified: Date

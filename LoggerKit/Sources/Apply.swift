@@ -67,6 +67,7 @@ extension Entry {
     init(store: Store.Entry) {
         self.id = store.id
         self.text = store.text
+        self.image = decodeImageURL(store.text)
         self.color = store.color
         self.created = must(parseEpoch: store.created)
         self.modified = must(parseEpoch: store.modified)
@@ -88,3 +89,14 @@ func must(parseEpoch value: Int?, or: Date = Date()) -> Date {
     guard let value = value, let interval = TimeInterval(exactly: value) else { return or }
     return Date(timeIntervalSince1970: interval)
 }
+
+func decodeImageURL(_ text: String) -> URL? {
+    if let image = text.match(regex: "^(!\\[image\\])\\(\\d+.(jpeg|png|jpg)\\)$").first {
+        let filename = String(image.dropFirst(9).dropLast(1))
+        var url = defaultPhotosURL
+        url.appendPathComponent(filename)
+        return url
+    }
+    return nil
+}
+

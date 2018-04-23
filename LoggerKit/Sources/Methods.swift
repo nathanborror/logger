@@ -45,8 +45,8 @@ extension Kit {
         try store.delete(entry: entry.id)
         commit { $0.entries.removeValue(forKey: entry.id) }
 
-        if let imageURL = imageURL(for: entry) {
             try FileManager.default.removeItem(at: imageURL)
+        if let imageURL = entry.image {
         }
     }
 
@@ -57,22 +57,5 @@ extension Kit {
         }
         let ids = try store.search(entries: query!)
         commit { $0.search.apply(entries: ids, for: query) }
-    }
-
-    public static func openEntry(_ entry: Entry) -> Data? {
-        if let imageURL = imageURL(for: entry) {
-            return try? Data(contentsOf: imageURL)
-        }
-        return nil
-    }
-
-    private static func imageURL(for entry: Entry) -> URL? {
-        if let image = entry.text.match(regex: "^(!\\[image\\])\\(\\d+.(jpeg|png|jpg)\\)$").first {
-            let filename = String(image.dropFirst(9).dropLast(1))
-            var url = defaultPhotosURL
-            url.appendPathComponent(filename)
-            return url
-        }
-        return nil
     }
 }
