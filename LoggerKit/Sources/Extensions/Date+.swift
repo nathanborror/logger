@@ -4,8 +4,12 @@ import Foundation
 
 extension Date {
 
-    public static var since1970: Int {
+    public static var unixEpoch: Int {
         return Int(Date().timeIntervalSince1970)
+    }
+
+    public var unixEpoch: Int {
+        return Int(timeIntervalSince1970)
     }
 
     public var naturalDateTime: String {

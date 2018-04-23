@@ -20,7 +20,7 @@ extension Kit {
     }
 
     public static func entryCreate(url: URL) throws {
-        let filename = "\(Date.since1970).\(url.pathExtension)"
+        let filename = "\(Date.unixEpoch).\(url.pathExtension)"
         var newURL = defaultPhotosURL
         newURL.appendPathComponent(filename)
         try FileManager.default.copyItem(at: url, to: newURL)

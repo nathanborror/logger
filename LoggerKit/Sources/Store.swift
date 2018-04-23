@@ -143,7 +143,8 @@ extension Store.Entry {
         self.modified   = encodeInt(row[4])!
     }
 
-    init(id: Int = 0, text: String, color: Int = 0, modified: Int = Date.since1970, created: Int = Date.since1970) {
+    init(id: Int = 0, text: String, color: Int = 0,
+         modified: Int = Date.unixEpoch, created: Int = Date.unixEpoch) {
         self.id = id
         self.text = text
         self.color = color
