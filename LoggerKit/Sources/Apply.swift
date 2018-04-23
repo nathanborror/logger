@@ -6,6 +6,7 @@ extension State {
         self.entries = [:]
         self.timeline = Timeline()
         self.search = Search()
+        self.undo = Undo()
     }
 
     mutating func apply(entries: [Store.Entry]) {
@@ -59,6 +60,13 @@ extension Search {
     mutating func apply(entries: [Int], for query: String?) {
         self.query = query
         self.results = entries
+    }
+}
+
+extension Undo {
+
+    init() {
+        self.deleted = []
     }
 }
 

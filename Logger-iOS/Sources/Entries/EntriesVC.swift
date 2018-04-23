@@ -74,6 +74,7 @@ class EntriesTableVC: UIViewController {
         if model.applySearch(state) {
             tableView.reloadData()
         }
+        _ = model.applyUndo(state)
     }
 
     // MARK: - Handlers
@@ -111,10 +112,20 @@ class EntriesTableVC: UIViewController {
 
     override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
         guard motion == .motionShake else { return }
+        guard model.isUndoAvailable else { return }
 
-        let dir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+        let vc = UIAlertController(title: "Undo Delete", message: nil, preferredStyle: .alert)
+        vc.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        vc.addAction(UIAlertAction(title: "Undo", style: .default, handler: { _ in
+            try! Kit.undoEntryDelete()
+        }))
+        present(vc, animated: true, completion: nil)
+    }
+
+    func handleExportOptions() {
+        let dir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask,
+                                               appropriateFor: nil, create: true)
         let file = dir.appendingPathComponent("data.logger")
-
         let controller = UIActivityViewController(activityItems: [file], applicationActivities: nil)
         present(controller, animated: true, completion: nil)
     }
@@ -191,6 +202,7 @@ struct EntriesModel {
 
     var entries: [Entry] = []
     var matches: [Int] = []
+    var isUndoAvailable = false
 
     mutating func applyEntries(_ state: State) -> Bool {
         let stateEntries = Array(state.entries.values).sorted { $0.created < $1.created }
@@ -204,6 +216,13 @@ struct EntriesModel {
         guard matches != stateMatches else { return false }
         self.matches = stateMatches
         self.entries = filter(state.entries, ids: matches)
+        return true
+    }
+
+    mutating func applyUndo(_ state: State) -> Bool {
+        let stateIsUndoAvailable = state.undo.deleted.count > 0
+        guard isUndoAvailable != stateIsUndoAvailable else { return false }
+        isUndoAvailable = stateIsUndoAvailable
         return true
     }
 

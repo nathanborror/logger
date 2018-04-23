@@ -4,6 +4,7 @@ public struct State {
     public var entries: [Int: Entry]
     public var timeline: Timeline
     public var search: Search
+    public var undo: Undo
 }
 
 public struct Timeline: Equatable {
@@ -19,6 +20,10 @@ public struct Timeline: Equatable {
 public struct Search: Equatable {
     public var query: String?
     public var results: [Int]
+}
+
+public struct Undo: Equatable {
+    public var deleted: [Entry]
 }
 
 public struct Entry: Equatable, Hashable {

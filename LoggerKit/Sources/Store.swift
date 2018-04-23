@@ -94,6 +94,19 @@ class Store {
         return try entry(id: id)
     }
 
+    func restore(entry rec: Entry) throws -> Entry {
+        let insert = """
+            INSERT INTO entry (text, color, created, modified)
+            VALUES (?, ?, ?, ?);
+            """
+        let prepared = try db.prepare(insert)
+        try prepared.run(rec.text, rec.color, rec.created, rec.modified)
+        guard db.changes == 1 else {
+            throw StoreError.failure("Failed to insert entry")
+        }
+        return try entry(id: Int(db.lastInsertRowid))
+    }
+
     func delete(entry id: Int) throws {
         let delete = "DELETE FROM entry WHERE id = ?"
         let prepared = try db.prepare(delete)

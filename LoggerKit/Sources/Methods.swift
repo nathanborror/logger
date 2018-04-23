@@ -13,6 +13,14 @@ extension Kit {
     public static func suspend() throws {
     }
 
+    public static func undoEntryDelete() throws {
+        guard let entry = state.undo.deleted.last else {
+            return
+        }
+        commit { $0.undo.deleted.removeLast() }
+        try entryRestore(entry: entry)
+    }
+
     public static func entryCreate(text: String, color: Int? = nil) throws {
         var entry = Store.Entry(text: text)
         entry = try store.insert(entry: entry)
@@ -25,6 +33,21 @@ extension Kit {
         newURL.appendPathComponent(filename)
         try FileManager.default.copyItem(at: url, to: newURL)
         try entryCreate(text: "![image](\(filename))")
+    }
+
+    public static func entryRestore(entry: Entry) throws {
+
+        // Recover entry
+        let storeEntry = Store.Entry(id: entry.id, text: entry.text, color: entry.color,
+                                created: entry.created.unixEpoch,
+                                modified: entry.modified.unixEpoch)
+        let restored = try store.restore(entry: storeEntry)
+
+        // Recover entry image
+        if let trashURL = entry.image, let imageURL = decodeImageURL(entry.text) {
+            try FileManager.default.copyItem(at: trashURL, to: imageURL)
+        }
+        commit { $0.apply(entry: restored) }
     }
 
     public static func entry(_ id: Int, setText text: String) throws {
@@ -42,11 +65,16 @@ extension Kit {
     }
     
     public static func entryDelete(entry: Entry) throws {
+        var entry = entry
         try store.delete(entry: entry.id)
-        commit { $0.entries.removeValue(forKey: entry.id) }
-
-            try FileManager.default.removeItem(at: imageURL)
         if let imageURL = entry.image {
+            var itemURL: NSURL?
+            try FileManager.default.trashItem(at: imageURL, resultingItemURL: &itemURL)
+            entry.image = itemURL as URL?
+        }
+        commit {
+            $0.entries.removeValue(forKey: entry.id)
+            $0.undo.deleted.append(entry)
         }
     }
 
