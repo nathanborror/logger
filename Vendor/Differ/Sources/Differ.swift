@@ -12,16 +12,6 @@ public enum Operation: Equatable {
   case delete(Int)
   case move(Int, Int)
   case update(Int)
-
-  public static func ==(lhs: Operation, rhs: Operation) -> Bool {
-    switch (lhs, rhs) {
-    case let (.insert(l), .insert(r)),
-         let (.delete(l), .delete(r)),
-         let (.update(l), .update(r)): return l == r
-    case let (.move(l), .move(r)): return l == r
-    default: return false
-    }
-  }
 }
 
 enum Counter {
