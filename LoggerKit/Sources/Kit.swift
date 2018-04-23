@@ -18,7 +18,6 @@ public class Kit {
 
     public static let StateDidChange = Notification.Name("KitStateDidChange")
 
-    public static var images: Images { return shared.images }
     public static var state: State { return shared.state }
 
     static var shared: Kit = Kit()
@@ -26,14 +25,12 @@ public class Kit {
 
     internal var state: State
     internal var store: Store!
-    internal var images: Images
 
     internal var downloads: DispatchQueue
     internal var commits: DispatchQueue
 
     init() {
         self.state = State()
-        self.images = Images()
         self.store = try! Store(url: defaultDatabaseURL)
         self.downloads = DispatchQueue(label: "downloads.queue")
         self.commits = DispatchQueue(label: "commits.queue")
