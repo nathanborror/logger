@@ -24,7 +24,7 @@ extension ComposerDelegate {
     func composerPhotoPickerShouldShow(_ composer: Composer) {}
 }
 
-class Composer: UIControl {
+class Composer: UIInputView {
 
     var insets: UIEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
     weak var delegate: ComposerDelegate?
@@ -65,7 +65,7 @@ class Composer: UIControl {
     var textViewHeightAnchor: NSLayoutConstraint!
 
     init() {
-        super.init(frame: .zero)
+        super.init(frame: .zero, inputViewStyle: .default)
 
         autoresizingMask = [.flexibleHeight]
         backgroundColor = .background
