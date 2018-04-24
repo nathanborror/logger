@@ -83,7 +83,7 @@ class EntryCell: UITableViewCell {
 
     override func sizeThatFits(_ size: CGSize) -> CGSize {
         guard isImage == false else {
-            return CGSize(width: imageSize.width, height: imageSize.height + additionalHeight)
+            return CGSize(width: imageSize.width, height: imageSize.height + gapHeight)
         }
         let insets = separatorInset + contentInset
         let entryFit = size.insetBy(insets).infiniteHeight()
