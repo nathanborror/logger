@@ -6,7 +6,7 @@ class Store {
     internal let db: Connection
 
     init(url: URL) throws {
-        print("💾 \(url.path)")
+        //print("💾 \(url.path)")
         self.db = try Connection(url.absoluteString)
         try setupDatabase()
     }

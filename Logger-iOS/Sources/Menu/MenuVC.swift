@@ -24,6 +24,7 @@ class MenuVC: UIViewController, MenuPresentable {
         deleteButton.addTarget(self, action: #selector(handleDelete), for: .primaryActionTriggered)
 
         searchButton.setImage(.iconSearch, for: .normal)
+        searchButton.tintColor = .systemBlue
         searchButton.addTarget(self, action: #selector(handleSearch), for: .primaryActionTriggered)
 
         stackView.distribution = .fillEqually

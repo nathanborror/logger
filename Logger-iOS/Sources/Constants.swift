@@ -12,7 +12,7 @@ extension UIColor {
     static let entryBackground = UIColor(hex: 0x0A2A46)
     static let entryText = UIColor(hex: 0xEBF2F8)
     static let entryTint = UIColor(hex: 0xFFFFA2)
-    static let systemBlue = UIColor(hex: 0x327BF7)
+    static let systemBlue = UIColor(hex: 0x0A2A46)
     static let systemGray = UIColor(hex: 0x8E8E93)
     static let systemRed = UIColor(hex: 0xEB4D3D)
 }
