@@ -29,7 +29,7 @@ extension Kit {
 
     public static func entryCreate(url: URL) throws {
         let filename = "\(Date.unixEpoch).\(url.pathExtension)"
-        var newURL = defaultPhotosURL
+        var newURL = FileManager.photosDir
         newURL.appendPathComponent(filename)
         try FileManager.default.copyItem(at: url, to: newURL)
         try entryCreate(text: "![image](\(filename))")
@@ -44,8 +44,8 @@ extension Kit {
         let restored = try store.restore(entry: storeEntry)
 
         // Recover entry image
-        if let trashURL = entry.image, let imageURL = decodeImageURL(entry.text) {
-            try FileManager.default.copyItem(at: trashURL, to: imageURL)
+        if let tempURL = entry.image, let imageURL = decodeImageURL(entry.text) {
+            try FileManager.default.moveItem(at: tempURL, to: imageURL)
         }
         commit { $0.apply(entry: restored) }
     }
@@ -66,12 +66,13 @@ extension Kit {
     
     public static func entryDelete(entry: Entry) throws {
         var entry = entry
-        try store.delete(entry: entry.id)
         if let imageURL = entry.image {
-            var itemURL: NSURL?
-            try FileManager.default.trashItem(at: imageURL, resultingItemURL: &itemURL)
-            entry.image = itemURL as URL?
+            var tempURL = FileManager.photosCacheDir
+            tempURL.appendPathComponent(imageURL.lastPathComponent)
+            try FileManager.default.moveItem(at: imageURL, to: tempURL)
+            entry.image = tempURL
         }
+        try store.delete(entry: entry.id)
         commit {
             $0.entries.removeValue(forKey: entry.id)
             $0.undo.deleted.append(entry)

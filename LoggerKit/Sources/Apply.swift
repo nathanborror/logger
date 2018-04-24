@@ -101,7 +101,7 @@ func must(parseEpoch value: Int?, or: Date = Date()) -> Date {
 func decodeImageURL(_ text: String) -> URL? {
     if let image = text.match(regex: "^(!\\[image\\])\\(\\d+.(jpeg|png|jpg)\\)$").first {
         let filename = String(image.dropFirst(9).dropLast(1))
-        var url = defaultPhotosURL
+        var url = FileManager.photosDir
         url.appendPathComponent(filename)
         return url
     }

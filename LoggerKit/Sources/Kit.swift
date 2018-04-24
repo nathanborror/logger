@@ -1,17 +1,29 @@
 import Foundation
 
-var defaultDatabaseURL: URL {
-    let dir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-    return dir.appendingPathComponent("data.logger")
-}
+extension FileManager {
 
-var defaultPhotosURL: URL {
-    var dir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-    dir.appendPathComponent("Photos", isDirectory: true)
-    if FileManager.default.fileExists(atPath: dir.path) == false {
-        try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+    static var database: URL {
+        return url(for: .documentDirectory).appendingPathComponent("data.logger")
     }
-    return dir
+
+    static var photosDir: URL {
+        return url(for: .documentDirectory, folder: "Photos")
+    }
+
+    static var photosCacheDir: URL {
+        return url(for: .cachesDirectory, folder: "Photos")
+    }
+
+    static func url(for path: FileManager.SearchPathDirectory, folder: String? = nil) -> URL {
+        var dir = try! FileManager.default.url(for: path, in: .userDomainMask, appropriateFor: nil, create: true)
+        if let folder = folder {
+            dir.appendPathComponent(folder, isDirectory: true)
+            if FileManager.default.fileExists(atPath: dir.path) == false {
+                try! FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+            }
+        }
+        return dir
+    }
 }
 
 public class Kit {
@@ -31,7 +43,7 @@ public class Kit {
 
     init() {
         self.state = State()
-        self.store = try! Store(url: defaultDatabaseURL)
+        self.store = try! Store(url: FileManager.database)
         self.downloads = DispatchQueue(label: "downloads.queue")
         self.commits = DispatchQueue(label: "commits.queue")
 
@@ -51,8 +63,8 @@ public class Kit {
 
     public static func replaceDatabase(with url: URL) throws {
         let data = try Data(contentsOf: url)
-        FileManager.default.createFile(atPath: defaultDatabaseURL.path, contents: data)
-        shared.store = try Store(url: defaultDatabaseURL)
+        FileManager.default.createFile(atPath: FileManager.database.path, contents: data)
+        shared.store = try Store(url: FileManager.database)
         try Kit.activate()
     }
 
