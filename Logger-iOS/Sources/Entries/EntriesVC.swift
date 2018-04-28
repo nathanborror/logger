@@ -91,6 +91,7 @@ class EntriesTableVC: UIViewController {
         vc.preferredContentSize = CGSize(width: 160, height: 54)
         vc.sourceRect = cellFrame
         vc.modalPresentationStyle = .custom
+        vc.searchButton.isHidden = entry.image != nil
         presentOverKeyboard(vc, animated: true, completion: nil)
     }
 
