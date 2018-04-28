@@ -135,6 +135,8 @@ class Composer: UIInputView {
     }
 
     func reload() {
+        textView.isScrollEnabled = false
+        textViewHeightAnchor.isActive = false
         placeholderOn()
     }
 
