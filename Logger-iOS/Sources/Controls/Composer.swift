@@ -79,7 +79,7 @@ class Composer: UIInputView {
         textView.layer.borderColor = UIColor(white: 0.7, alpha: 1).cgColor
         textView.layer.borderWidth = 1 / UIScreen.main.scale
         textView.isScrollEnabled = false
-        textView.textContainerInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
+        textView.textContainerInset = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 28 + 8)
         textView.textContainer.lineFragmentPadding = 0
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.keyboardType = .twitter
@@ -246,7 +246,6 @@ extension Composer: UITextViewDelegate {
     }
 
     func textViewDidChange(_ textView: UITextView) {
-
         if textView.bounds.height >= textViewHeightAnchor.constant {
             textView.isScrollEnabled = true
             textViewHeightAnchor.isActive = true
