@@ -16,6 +16,7 @@ targets:
       DEVELOPMENT_TEAM: 294VZ3T33E
       IPHONEOS_DEPLOYMENT_TARGET: 11.0
       OTHER_SWIFT_FLAGS: "-Onone -Xfrontend -warn-long-function-bodies=100 -Xfrontend -warn-long-expression-type-checking=100"
+      TARGETED_DEVICE_FAMILY: 1
     scheme:
       testTargets:
       - Logger-iOSTests
