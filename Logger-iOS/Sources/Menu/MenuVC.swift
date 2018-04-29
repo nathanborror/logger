@@ -9,6 +9,7 @@ class MenuVC: UIViewController, MenuPresentable {
     let stackView = UIStackView()
     let deleteButton = UIButton(type: .system)
     let searchButton = UIButton(type: .system)
+    let wikiButton = UIButton(type: .system)
 
     convenience init(entry: Entry) {
         self.init(nibName: nil, bundle: nil)
@@ -27,11 +28,16 @@ class MenuVC: UIViewController, MenuPresentable {
         searchButton.tintColor = .systemBlue
         searchButton.addTarget(self, action: #selector(handleSearch), for: .primaryActionTriggered)
 
+        wikiButton.setImage(.iconWikipedia, for: .normal)
+        wikiButton.tintColor = .systemBlue
+        wikiButton.addTarget(self, action: #selector(handleWikipedia), for: .primaryActionTriggered)
+
         stackView.distribution = .fillEqually
         stackView.frame = view.bounds
         stackView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         stackView.addArrangedSubview(deleteButton)
         stackView.addArrangedSubview(searchButton)
+        stackView.addArrangedSubview(wikiButton)
         view.addSubview(stackView)
     }
 
@@ -39,13 +45,24 @@ class MenuVC: UIViewController, MenuPresentable {
         defer { dismiss(animated: true, completion: nil) }
         let cleaned = entry.text.replace(regex: "#(\\w+\\s?)", with: "")
         let query = cleaned.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-        let url = URL(string: "https://google.com/search?q=\(query)")!
-        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        openBrowser(url: "https://google.com/search?q=\(query)")
+    }
+
+    @objc func handleWikipedia() {
+        defer { dismiss(animated: true, completion: nil) }
+        let cleaned = entry.text.replace(regex: "#(\\w+\\s?)", with: "")
+        let query = cleaned.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+        openBrowser(url: "https://google.com/search?q=\(query)+site:wikipedia.org&btnI")
     }
 
     @objc func handleDelete() {
         defer { dismiss(animated: true, completion: nil) }
         try! Kit.entryDelete(entry: entry)
+    }
+
+    private func openBrowser(url: String) {
+        let url = URL(string: url)!
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
     }
 }
 

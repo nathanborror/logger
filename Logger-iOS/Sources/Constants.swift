@@ -24,4 +24,5 @@ extension UIImage {
     static let iconArrowUp      = UIImage(named: "ArrowUp")!.withRenderingMode(.alwaysTemplate)
     static let iconCamera       = UIImage(named: "Camera")!.withRenderingMode(.alwaysTemplate)
     static let iconTrash        = UIImage(named: "Trash")!.withRenderingMode(.alwaysTemplate)
+    static let iconWikipedia    = UIImage(named: "Wikipedia")!.withRenderingMode(.alwaysTemplate)
 }

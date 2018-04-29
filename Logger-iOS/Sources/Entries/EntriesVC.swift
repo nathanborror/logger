@@ -88,10 +88,14 @@ class EntriesTableVC: UIViewController {
 
         let vc = MenuVC(entry: entry)
         vc.transitioningDelegate = vc
-        vc.preferredContentSize = CGSize(width: 160, height: 54)
+        vc.preferredContentSize = CGSize(width: 240, height: 54)
         vc.sourceRect = cellFrame
         vc.modalPresentationStyle = .custom
-        vc.searchButton.isHidden = entry.image != nil
+        if entry.image != nil {
+            vc.searchButton.isHidden = true
+            vc.wikiButton.isHidden = true
+            vc.preferredContentSize = CGSize(width: 80, height: 54)
+        }
         presentOverKeyboard(vc, animated: true, completion: nil)
     }
 
