@@ -80,6 +80,7 @@ class EntriesTableVC: UIViewController {
     // MARK: - Handlers
 
     @objc func handleLongPress(recognizer: UILongPressGestureRecognizer) {
+        guard recognizer.state == .began else { return }
         let point = recognizer.location(in: tableView)
         guard let indexPath = tableView.indexPathForRow(at: point) else { return }
         guard let cell = tableView.cellForRow(at: indexPath) as? EntryCell else { return }
