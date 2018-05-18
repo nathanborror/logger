@@ -31,7 +31,6 @@ class EntriesTableVC: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(EntryCell.self, forCellReuseIdentifier: "EntryCell")
-        tableView.keyboardDismissMode = .interactive
         tableView.separatorStyle = .none
         tableView.allowsSelection = false
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 16)
@@ -55,6 +54,11 @@ class EntriesTableVC: UIViewController {
                                                name: .UIKeyboardDidChangeFrame, object: nil)
 
         Kit.observe(self, selector: #selector(stateChange))
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        composer.textView.becomeFirstResponder()
+        super.viewDidAppear(animated)
     }
 
     @objc func stateChange() {

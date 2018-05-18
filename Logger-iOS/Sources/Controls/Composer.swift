@@ -275,6 +275,10 @@ extension Composer: UITextViewDelegate {
         textView.selectedTextRange = textView.textRange(from: textView.beginningOfDocument, to: textView.beginningOfDocument)
     }
 
+    func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
+        return false
+    }
+
     func textViewDidBeginEditing(_ textView: UITextView) {
         delegate?.composerDidBeginEditing(self)
     }
