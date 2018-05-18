@@ -51,7 +51,8 @@ class EntriesTableVC: UIViewController {
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
         tableView.addGestureRecognizer(longPress)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidChange), name: .UIKeyboardDidChangeFrame, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidChange),
+                                               name: .UIKeyboardDidChangeFrame, object: nil)
 
         Kit.observe(self, selector: #selector(stateChange))
     }
@@ -75,6 +76,11 @@ class EntriesTableVC: UIViewController {
             tableView.reloadData()
         }
         _ = model.applyUndo(state)
+    }
+
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        composer.bottomSafeAreaInset = view.safeAreaInsets.bottom
     }
 
     // MARK: - Handlers
@@ -176,6 +182,14 @@ extension EntriesTableVC: UITableViewDataSource, UITableViewDelegate {
 }
 
 extension EntriesTableVC: ComposerDelegate {
+
+    func composerDidBeginEditing(_ composer: Composer) {
+        composer.bottomSafeAreaInset = 0
+    }
+
+    func composerDidEndEditing(_ composer: Composer) {
+        composer.bottomSafeAreaInset = view.safeAreaInsets.bottom
+    }
 
     func composerDidSubmit(_ composer: Composer) {
         guard let text = composer.text else { return }

@@ -26,8 +26,13 @@ extension ComposerDelegate {
 
 class Composer: UIInputView {
 
-    var insets: UIEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
     weak var delegate: ComposerDelegate?
+
+    var insets: UIEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+    var bottomSafeAreaInset: CGFloat = 0 {
+        didSet { bottomSafeAreaConstraint?.constant = -(bottomSafeAreaInset + insets.bottom) }
+    }
+    var bottomSafeAreaConstraint: NSLayoutConstraint?
 
     var text: String? {
         guard isPlaceholding != true else { return nil }
@@ -70,7 +75,8 @@ class Composer: UIInputView {
         autoresizingMask = [.flexibleHeight]
         backgroundColor = .background
 
-        contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.frame = bounds
+        contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         addSubview(contentView)
 
         textView.delegate = self
@@ -84,7 +90,6 @@ class Composer: UIInputView {
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.keyboardType = .twitter
         textView.backgroundColor = .white
-        textView.tintColor = .black
         contentView.addSubview(textView)
 
         searchIcon.image = .iconSearch
@@ -101,24 +106,21 @@ class Composer: UIInputView {
 
         textViewHeightAnchor = textView.heightAnchor.constraint(equalToConstant: 96)
 
-        NSLayoutConstraint.activate([
-            contentView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-            contentView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
-            contentView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+        bottomSafeAreaConstraint = textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
 
+        NSLayoutConstraint.activate([
             textView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: insets.top),
-            textView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -insets.bottom),
             textView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: insets.left),
             textView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -insets.right),
+            bottomSafeAreaConstraint!,
 
-            searchIcon.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -(insets.bottom + 7)),
-            searchIcon.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: (insets.left + 8)),
+            searchIcon.bottomAnchor.constraint(equalTo: textView.bottomAnchor, constant: -7),
+            searchIcon.leadingAnchor.constraint(equalTo: textView.leadingAnchor, constant: 8),
             searchIcon.widthAnchor.constraint(equalToConstant: 24),
             searchIcon.heightAnchor.constraint(equalToConstant: 24),
 
-            primaryButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -(insets.bottom + 5)),
-            primaryButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -13),
+            primaryButton.bottomAnchor.constraint(equalTo: textView.bottomAnchor, constant: -5),
+            primaryButton.trailingAnchor.constraint(equalTo: textView.trailingAnchor, constant: -5),
             primaryButton.widthAnchor.constraint(equalToConstant: 28),
             primaryButton.heightAnchor.constraint(equalToConstant: 28),
         ])
@@ -131,7 +133,8 @@ class Composer: UIInputView {
     }
 
     override var intrinsicContentSize: CGSize {
-        return CGSize(width: UIViewNoIntrinsicMetric, height: 32 + insets.top + insets.bottom)
+        return CGSize(width: UIViewNoIntrinsicMetric, height: max(38, textView.bounds.height) +
+            insets.top + insets.bottom)
     }
 
     func reload() {
