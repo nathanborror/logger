@@ -1,5 +1,5 @@
 all:
-	XcodeGen
+	xcodegen
 
 clean:
 	rm -rf Logger.xcodeproj/project.xcworkspace/xcuserdata
