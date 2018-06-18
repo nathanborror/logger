@@ -11,10 +11,10 @@ extension UIColor {
     static let background       = UIColor(hex: 0xF9F9F9)
     static let entryBackground  = UIColor(hex: 0x000000)
     static let entryText        = UIColor(hex: 0xF9F9F9)
-    static let entryTint        = UIColor(hex: 0xFFFFA2)
+    static let entryTint        = UIColor(hex: 0xFFF897)
     static let systemBlue       = UIColor(hex: 0x007AFF)
     static let systemGray       = UIColor(hex: 0x8E8E93)
-    static let systemRed        = UIColor(hex: 0xEB4D3D)
+    static let systemRed        = UIColor(hex: 0xFF0055)
 }
 
 extension UIImage {

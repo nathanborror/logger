@@ -305,7 +305,7 @@ class PrimaryButton: UIControl {
         self.init(frame: .zero)
 
         background.frame = bounds
-        background.backgroundColor = UIColor.systemBlue.cgColor
+        background.backgroundColor = UIColor.systemRed.cgColor
         layer.addSublayer(background)
 
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTapped))
@@ -332,7 +332,7 @@ class PrimaryButton: UIControl {
     func animateBackground() {
         switch stage {
         case .send:
-            background.backgroundColor = UIColor.systemBlue.cgColor
+            background.backgroundColor = UIColor.systemRed.cgColor
             background.frame = bounds
             background.contents = UIImage.iconArrowUp.cgImage
         case .photo:
