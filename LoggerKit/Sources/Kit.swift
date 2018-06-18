@@ -6,15 +6,15 @@ extension FileManager {
         return url(for: .documentDirectory).appendingPathComponent("data.logger")
     }
 
-    static var photosDir: URL {
+    public static var photosDir: URL {
         return url(for: .documentDirectory, folder: "Photos")
     }
 
-    static var photosCacheDir: URL {
+    public static var photosCacheDir: URL {
         return url(for: .cachesDirectory, folder: "Photos")
     }
 
-    static func url(for path: FileManager.SearchPathDirectory, folder: String? = nil) -> URL {
+    public static func url(for path: FileManager.SearchPathDirectory, folder: String? = nil) -> URL {
         var dir = try! FileManager.default.url(for: path, in: .userDomainMask, appropriateFor: nil, create: true)
         if let folder = folder {
             dir.appendPathComponent(folder, isDirectory: true)

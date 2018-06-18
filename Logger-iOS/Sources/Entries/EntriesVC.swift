@@ -128,8 +128,10 @@ class EntriesTableVC: UIViewController {
 
     override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
         guard motion == .motionShake else { return }
-        guard model.isUndoAvailable else { return }
-
+        guard model.isUndoAvailable else {
+            handleExportOptions()
+            return
+        }
         let vc = UIAlertController(title: "Undo Delete", message: nil, preferredStyle: .alert)
         vc.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         vc.addAction(UIAlertAction(title: "Undo", style: .default, handler: { _ in
@@ -139,11 +141,8 @@ class EntriesTableVC: UIViewController {
     }
 
     func handleExportOptions() {
-        let dir = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask,
-                                               appropriateFor: nil, create: true)
-        let file = dir.appendingPathComponent("data.logger")
-        let controller = UIActivityViewController(activityItems: [file], applicationActivities: nil)
-        present(controller, animated: true, completion: nil)
+        let vc = UIActivityViewController(activityItems: [FileManager.database], applicationActivities: nil)
+        present(vc, animated: true, completion: nil)
     }
 
     // MARK: - Keyboard
