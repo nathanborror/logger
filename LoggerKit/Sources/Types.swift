@@ -28,6 +28,8 @@ public struct Undo: Equatable {
 
 public struct Entry: Equatable, Hashable {
     public var id: Int
+    public var kind: EntryKind
+    public var alignment: EntryAlignment
     public var text: String
     public var image: URL?
     public var color: Int
@@ -37,4 +39,15 @@ public struct Entry: Equatable, Hashable {
     public var hashValue: Int {
         return id.hashValue
     }
+}
+
+public enum EntryKind {
+    case text
+    case image
+}
+
+public enum EntryAlignment {
+    case left
+    case right
+    case center
 }

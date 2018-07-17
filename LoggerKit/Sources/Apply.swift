@@ -79,6 +79,8 @@ extension Entry {
         self.color = store.color
         self.created = must(parseEpoch: store.created)
         self.modified = must(parseEpoch: store.modified)
+        self.kind = self.image != nil ? .image : .text
+        self.alignment = .left
     }
 
     mutating func apply(store: Store.Entry) {
