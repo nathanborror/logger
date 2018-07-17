@@ -55,6 +55,10 @@ extension CGRect {
 
 extension CGPoint {
 
+    func distance(_ b: CGPoint) -> CGFloat {
+        return sqrt(pow(x - b.x, 2) + pow(y - b.y, 2))
+    }
+
     /// Returns a CGPoint offset by the given CGRect's maxY position.
     func offsetY(_ rect: CGRect) -> CGPoint {
         return CGPoint(x: x, y: y + rect.maxY)
@@ -67,5 +71,13 @@ extension CGPoint {
 
     static func +(lhs: CGPoint, rhs: CGPoint) -> CGPoint {
         return CGPoint(x: lhs.x + rhs.x, y: lhs.y + rhs.y)
+    }
+
+    static func -(lhs: CGPoint, rhs: CGPoint) -> CGPoint {
+        return CGPoint(x: lhs.x - rhs.x, y: lhs.y - rhs.y)
+    }
+
+    static func *(lhs: CGPoint, rhs: CGPoint) -> CGPoint {
+        return CGPoint(x: lhs.x * rhs.x, y: lhs.y * rhs.y)
     }
 }
