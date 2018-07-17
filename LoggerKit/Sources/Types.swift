@@ -1,32 +1,32 @@
 import Foundation
 
-public struct State {
+public struct State: Codable {
     public var entries: [Int: Entry]
     public var timeline: Timeline
     public var search: Search
     public var undo: Undo
 }
 
-public struct Timeline: Equatable {
+public struct Timeline: Codable, Equatable {
     public var days: [Date: Day]
     public var lastUpdated: Date
 
-    public struct Day: Equatable {
+    public struct Day: Codable, Equatable {
         public var date: Date
         public var entries: [Int]
     }
 }
 
-public struct Search: Equatable {
+public struct Search: Codable, Equatable {
     public var query: String?
     public var results: [Int]
 }
 
-public struct Undo: Equatable {
+public struct Undo: Codable, Equatable {
     public var deleted: [Entry]
 }
 
-public struct Entry: Equatable, Hashable {
+public struct Entry: Codable, Equatable, Hashable {
     public var id: Int
     public var kind: EntryKind
     public var alignment: EntryAlignment
@@ -41,12 +41,12 @@ public struct Entry: Equatable, Hashable {
     }
 }
 
-public enum EntryKind {
+public enum EntryKind: Int, Codable {
     case text
     case image
 }
 
-public enum EntryAlignment {
+public enum EntryAlignment: Int, Codable {
     case left
     case right
     case center

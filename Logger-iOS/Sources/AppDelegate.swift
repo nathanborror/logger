@@ -12,6 +12,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.backgroundColor = .background
         window?.rootViewController = EntriesVC()
         window?.makeKeyAndVisible()
+
+        #if targetEnvironment(simulator)
+        Kit.observe(self, selector: #selector(stateChange))
+        #endif
+
         return true
     }
 
@@ -24,4 +29,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         try! Kit.replaceDatabase(with: url)
         return true
     }
+
+    #if targetEnvironment(simulator)
+    @objc func stateChange() {
+        let state = Kit.state
+        print(state)
+        try! debugger.write(action: "stateChange", state: state, snapshot: window!)
+    }
+
+    private let debugger = Debugger()
+    #endif
 }
