@@ -2,7 +2,7 @@ import Foundation
 
 extension FileManager {
 
-    static var database: URL {
+    public static var database: URL {
         return url(for: .documentDirectory).appendingPathComponent("data.logger")
     }
 
