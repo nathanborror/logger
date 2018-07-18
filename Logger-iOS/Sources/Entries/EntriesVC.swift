@@ -53,7 +53,7 @@ class EntriesTableVC: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardDidChange),
                                                name: .UIKeyboardDidChangeFrame, object: nil)
 
-        Kit.observe(self, selector: #selector(stateChange))
+        Kit.subscribe(self, selector: #selector(stateChange))
     }
 
     override func viewDidAppear(_ animated: Bool) {

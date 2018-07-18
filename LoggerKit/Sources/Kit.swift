@@ -56,9 +56,17 @@ public class Kit {
         NotificationCenter.default.removeObserver(self)
     }
 
-    public static func observe(_ observer: Any, selector: Selector) {
+    public static func subscribe(_ observer: NSObject, selector: Selector) {
         NotificationCenter.default.addObserver(observer, selector: selector, name: Kit.StateDidChange, object: nil)
-        notify()
+
+        // Call selector with current state
+        let userInfo: [String: Any] = ["action": "init", "state": shared.state]
+        let notification = Notification(name: Kit.StateDidChange, object: nil, userInfo: userInfo)
+        observer.perform(selector, with: notification)
+    }
+
+    public static func unsubscribe(_ observer: NSObject) {
+        NotificationCenter.default.removeObserver(observer, name: Kit.StateDidChange, object: nil)
     }
 
     public static func replaceDatabase(with url: URL) throws {
@@ -68,17 +76,18 @@ public class Kit {
         try Kit.activate()
     }
 
-    internal static func commit(_ mutation: @escaping (inout State) -> Void) {
+    internal static func commit(_ action: String, mutation: @escaping (inout State) -> Void) {
         shared.commits.async {
             var state = shared.state
             mutation(&state)
             shared.state = state
-            DispatchQueue.main.async { notify() }
+            DispatchQueue.main.async { notify(action, state: state) }
         }
     }
 
-    internal static func notify() {
+    internal static func notify(_ action: String, state: State) {
         assert(Thread.isMainThread)
-        NotificationCenter.default.post(name: StateDidChange, object: nil, userInfo: nil)
+        let userInfo: [String: Any] = ["action": action, "state": state]
+        NotificationCenter.default.post(name: StateDidChange, object: nil, userInfo: userInfo)
     }
 }
