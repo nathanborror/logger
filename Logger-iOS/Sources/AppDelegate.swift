@@ -14,7 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
 
         #if targetEnvironment(simulator)
-        Kit.observe(self, selector: #selector(stateChange))
+        Kit.subscribe(self, selector: #selector(stateChange))
         #endif
 
         return true
