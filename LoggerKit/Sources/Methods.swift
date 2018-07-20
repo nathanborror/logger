@@ -8,15 +8,6 @@ extension Kit {
             $0.apply(entries: entries.entries)
             $0.timeline.apply(entries: entries.entries)
         }
-
-        let fileManager = FileManager.default
-        let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        do {
-            let fileURLs = try fileManager.contentsOfDirectory(at: documentsURL, includingPropertiesForKeys: nil)
-            print(fileURLs)
-        } catch {
-            print("Error while enumerating files \(documentsURL.path): \(error.localizedDescription)")
-        }
     }
 
     public static func suspend() throws {
