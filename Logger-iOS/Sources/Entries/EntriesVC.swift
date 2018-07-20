@@ -61,8 +61,8 @@ class EntriesTableVC: UIViewController {
         super.viewDidAppear(animated)
     }
 
-    @objc func stateChange() {
-        let state = Kit.state
+    @objc func stateChange(notification: Notification) {
+        guard let state = notification.userInfo?["state"] as? State else { return }
         let priorEntries = model.entries
         if model.applyEntries(state) {
             if priorEntries.count > 0 {

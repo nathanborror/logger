@@ -31,10 +31,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     #if targetEnvironment(simulator)
-    @objc func stateChange() {
-        let state = Kit.state
-        print(state)
-        try! debugger.write(action: "stateChange", state: state, snapshot: window!)
+    @objc func stateChange(notification: Notification) {
+        guard let action = notification.userInfo?["action"] as? String else { return }
+        guard let state = notification.userInfo?["state"] as? State else { return }
+        try! debugger.write(action: action, state: state, snapshot: window!)
     }
 
     private let debugger = Debugger()
