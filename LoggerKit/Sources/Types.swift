@@ -1,18 +1,5 @@
 import Foundation
 
-public struct KitError: Error {
-    public enum Kind {
-        case noResults
-    }
-    let kind: Kind
-    let message: String
-
-    init(_ kind: Kind, _ message: String) {
-        self.kind = kind
-        self.message = message
-    }
-}
-
 public struct State: Codable, Equatable {
     public var entries: [Int: Entry]
     public var timeline: Timeline
