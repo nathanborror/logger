@@ -80,8 +80,10 @@ public class Kit {
         shared.commits.async {
             var state = shared.state
             mutation(&state)
-            shared.state = state
-            DispatchQueue.main.async { notify(action, state: state) }
+            if state != shared.state {
+                shared.state = state
+                DispatchQueue.main.async { notify(action, state: state) }
+            }
         }
     }
 

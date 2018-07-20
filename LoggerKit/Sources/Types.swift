@@ -1,6 +1,6 @@
 import Foundation
 
-public struct State: Codable {
+public struct State: Codable, Equatable {
     public var entries: [Int: Entry]
     public var timeline: Timeline
     public var search: Search
