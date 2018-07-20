@@ -47,13 +47,18 @@ class Store {
         }
     }
 
-    func entries() throws -> EntriesResponse {
+    func entries(limit: Int, offset: Int) throws -> EntriesResponse {
         var results: [Entry] = []
-        let select = "SELECT id, text, color, created, modified FROM entry;"
+        let select = """
+            SELECT id, text, color, created, modified
+            FROM entry
+            ORDER BY created DESC
+            LIMIT \(limit) OFFSET \(offset);
+            """
         for row in try db.prepare(select) {
             results.append(Entry(row: row))
         }
-        return EntriesResponse(entries: results)
+        return EntriesResponse(entries: results, limit: limit, offset: offset)
     }
 
     func entry(id: Int) throws -> Entry {
@@ -143,6 +148,8 @@ extension Store {
 
     struct EntriesResponse {
         let entries: [Entry]
+        let limit: Int
+        let offset: Int
     }
 }
 

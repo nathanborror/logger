@@ -182,6 +182,15 @@ extension EntriesTableVC: UITableViewDataSource, UITableViewDelegate {
         cell.onEntryPhotoTap = { [weak self] image in self?.handlePhoto(image) }
         return cell
     }
+
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard indexPath.row + 1 == model.entries.count else { return }
+        do {
+            try Kit.entries(offset: model.entries.count)
+        } catch {
+            print("Error EntriesVC.willDisplay:", error)
+        }
+    }
 }
 
 extension EntriesTableVC: ComposerDelegate {

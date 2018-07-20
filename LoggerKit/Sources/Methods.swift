@@ -3,11 +3,7 @@ import Foundation
 extension Kit {
 
     public static func activate() throws {
-        let entries = try store.entries()
-        commit("activate") {
-            $0.apply(entries: entries.entries)
-            $0.timeline.apply(entries: entries.entries)
-        }
+        try entries()
     }
 
     public static func suspend() throws {
@@ -19,6 +15,17 @@ extension Kit {
         }
         commit("entry:undo") { $0.undo.deleted.removeLast() }
         try entryRestore(entry: entry)
+    }
+
+    public static func entries(limit: Int = 100, offset: Int = 0) throws {
+        let entries = try store.entries(limit: limit, offset: offset)
+        guard entries.entries.count > 0 else {
+            throw KitError(.noResults, "No entries returned")
+        }
+        commit("entries:limit(\(limit)):offset(\(offset))") {
+            $0.apply(entries: entries.entries)
+            $0.timeline.apply(entries: entries.entries)
+        }
     }
 
     public static func entryCreate(text: String, color: Int? = nil) throws {

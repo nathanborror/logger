@@ -26,7 +26,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // TODO: Test bogus files
         // TODO: Store old databases someplace safe where they can be resurrected
 
-        try! Kit.replaceDatabase(with: url)
+        do {
+            try Kit.replaceDatabase(with: url)
+        } catch {
+            print("Error AppDelegate.open:", error)
+        }
         return true
     }
 

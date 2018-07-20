@@ -10,7 +10,6 @@ extension State {
     }
 
     mutating func apply(entries: [Store.Entry]) {
-        self.entries.removeAll()
         for entry in entries {
             apply(entry: entry)
         }

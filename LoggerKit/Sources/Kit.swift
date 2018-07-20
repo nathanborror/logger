@@ -48,7 +48,11 @@ public class Kit {
         self.commits = DispatchQueue(label: "commits.queue")
 
         NotificationCenter.default.addObserver(forName: .UIApplicationDidBecomeActive, object: nil, queue: nil) { _ in
-            try! Kit.activate()
+            do {
+                try Kit.activate()
+            } catch {
+                print("Error Kit.init:", error)
+            }
         }
     }
 
