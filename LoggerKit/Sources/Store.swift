@@ -52,10 +52,9 @@ class Store {
         let select = """
             SELECT id, text, color, created, modified
             FROM entry
-            ORDER BY created DESC
-            LIMIT \(limit) OFFSET \(offset);
+            ORDER BY created DESC LIMIT ? OFFSET ?;
             """
-        for row in try db.prepare(select) {
+        for row in try db.prepare(select, limit, offset) {
             results.append(Entry(row: row))
         }
         return EntriesResponse(entries: results, limit: limit, offset: offset)
