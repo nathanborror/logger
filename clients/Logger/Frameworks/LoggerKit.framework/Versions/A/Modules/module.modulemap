@@ -1,0 +1,8 @@
+framework module "LoggerKit" {
+	header "ref.h"
+    header "Logger.objc.h"
+    header "Universe.objc.h"
+    header "LoggerKit.h"
+
+    export *
+}
