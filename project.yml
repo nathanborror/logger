@@ -1,9 +1,0 @@
-name: Logger
-options:
-  bundleIdPrefix: run.nathan
-  xcodeVersion: 9.2
-include:
-- Logger-iOS/project.yml
-- LoggerKit/project.yml
-- Vendor/SQLite/project.yml
-- Vendor/Differ/project.yml
