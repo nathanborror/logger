@@ -2,8 +2,6 @@ import SwiftUI
 
 struct ComposerView: View {
     
-    var onSubmit: (String) -> Void
-    
     @State var text = ""
     @State var isSearching = false
     @State var isEmpty = true
@@ -16,7 +14,7 @@ struct ComposerView: View {
                 .cornerRadius(20)
                 .padding(1)
                 .background(Color(hue: 240/360, saturation: 1/100, brightness: 78/100))
-                .cornerRadius(20)
+                .cornerRadius(22)
                 .onChange(of: text) { (value) in
                     isSearching = value.hasPrefix(" ")
                     isEmpty = value == ""
@@ -38,7 +36,8 @@ struct ComposerView: View {
     
     func handleSubmit() {
         guard text != "" else { return }
-        onSubmit(text)
+        let item = Item(id: 0, text: text, color: 0)
+        NotificationCenter.default.post(name: .itemSave, object: item)
         text = ""
     }
 }

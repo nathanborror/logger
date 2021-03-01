@@ -1,6 +1,6 @@
 module github.com/nathanborror/logger/pkg/logger
 
-go 1.15
+go 1.16
 
 require (
 	github.com/jmoiron/sqlx v1.3.1

@@ -11,11 +11,10 @@
 #include "Universe.objc.h"
 
 
-@class LoggerError;
-@protocol LoggerMachine;
-@class LoggerMachine;
+@protocol LoggerStater;
+@class LoggerStater;
 
-@protocol LoggerMachine <NSObject>
+@protocol LoggerStater <NSObject>
 - (NSData* _Nullable)current;
 - (NSData* _Nullable)entryCreate:(NSString* _Nullable)text color:(int64_t)color;
 - (NSData* _Nullable)entryDelete:(int64_t)id_;
@@ -24,41 +23,21 @@
 @end
 
 /**
- * Error represents an error.
+ * New returns and implementation of the state interface.
  */
-@interface LoggerError : NSObject <goSeqRefInterface> {
-}
-@property(strong, readonly) _Nonnull id _ref;
-
-- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
-- (nonnull instancetype)init;
-@property (nonatomic) NSString* _Nonnull code;
-@property (nonatomic) NSError* _Nullable err;
-- (NSString* _Nonnull)error;
-/**
- * MarshalJSON is a custom marshaller for the Error type.
- */
-- (NSData* _Nullable)marshalJSON:(NSError* _Nullable* _Nullable)error;
-- (BOOL)unwrap:(NSError* _Nullable* _Nullable)error;
-@end
-
-// skipped function ErrorProgrammerFailure with unsupported parameter or return types
-
+FOUNDATION_EXPORT id<LoggerStater> _Nullable LoggerNew(NSString* _Nullable kind, NSString* _Nullable name);
 
 /**
- * New sets up a new database if one doesn't already exist.
+ * Version returns the current version of the framework.
  */
-FOUNDATION_EXPORT id<LoggerMachine> _Nullable LoggerNew(NSString* _Nullable name, NSError* _Nullable* _Nullable error);
+FOUNDATION_EXPORT NSString* _Nonnull LoggerVersion(void);
 
-// skipped function NewError with unsupported parameter or return types
-
-
-@class LoggerMachine;
+@class LoggerStater;
 
 /**
- * Machine defines the state interface.
+ * Stater is a alias to the state package which is otherwise invisible to the ios framework.
  */
-@interface LoggerMachine : NSObject <goSeqRefInterface, LoggerMachine> {
+@interface LoggerStater : NSObject <goSeqRefInterface, LoggerStater> {
 }
 @property(strong, readonly) _Nonnull id _ref;
 

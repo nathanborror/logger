@@ -11,8 +11,14 @@ struct LoggerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .background(Color(hex: 0xF9F9F9).ignoresSafeArea())
                 .environmentObject(store)
                 .environmentObject(sheetManager)
+                .onOpenURL { url in
+                    let original = FileManager.document(named: "data.logger")
+                    FileManager.replace(at: original, with: url)
+                    store.reload()
+                }
         }
     }
 }
@@ -21,35 +27,43 @@ struct ContentView: View {
     @EnvironmentObject var store: LoggerStore
     @EnvironmentObject var sheetManager: PartialSheetManager
     
+    @Environment(\.openURL) var openURL
+    
     var body: some View {
         VStack(spacing: 0) {
-            EntryList(entries: store.state.entries)
+            ItemList(items: store.state.items)
                 .environmentObject(sheetManager)
-            ComposerView(onSubmit: handleSubmit)
+            ComposerView()
                 .padding()
         }
         .addPartialSheet()
-        .onReceive(NotificationCenter.default.publisher(for: .entryDelete), perform: handleDelete)
-        .onReceive(NotificationCenter.default.publisher(for: .entrySearchGoogle), perform: handleSearchGoogle)
-        .onReceive(NotificationCenter.default.publisher(for: .entrySearchWikipedia), perform: handleSearchWikipedia)
+        .onReceive(NotificationCenter.default.publisher(for: .itemSave), perform: handleSave)
+        .onReceive(NotificationCenter.default.publisher(for: .itemDelete), perform: handleDelete)
+        .onReceive(NotificationCenter.default.publisher(for: .itemSearchGoogle), perform: handleSearchGoogle)
+        .onReceive(NotificationCenter.default.publisher(for: .itemSearchWikipedia), perform: handleSearchWikipedia)
     }
     
-    func handleSubmit(text: String) {
-        store.entryCreate(text: text, color: 0)
+    func handleSave(_ publisher: NotificationCenter.Publisher.Output) {
+        guard let item = publisher.object as? Item else { return }
+        if item.id == 0 {
+            store.itemCreate(text: item.text, color: item.color)
+        } else {
+            store.itemUpdate(id: item.id, text: item.text, color: item.color)
+        }
     }
     
     func handleDelete(_ publisher: NotificationCenter.Publisher.Output) {
-        guard let entry = publisher.object as? Entry else { return }
-        store.entryDelete(id: entry.id)
+        guard let item = publisher.object as? Item else { return }
+        store.itemDelete(id: item.id)
     }
     
     func handleSearchGoogle(_ publisher: NotificationCenter.Publisher.Output) {
-        guard let entry = publisher.object as? Entry else { return }
-        print("not implemented:", entry)
+        guard let item = publisher.object as? Item else { return }
+        openURL(URL(string: "https://google.com/search?q=\(item.text)")!)
     }
     
     func handleSearchWikipedia(_ publisher: NotificationCenter.Publisher.Output) {
-        guard let entry = publisher.object as? Entry else { return }
-        print("not implemented:", entry)
+        guard let item = publisher.object as? Item else { return }
+        openURL(URL(string: "https://google.com/search?q=\(item.text)+site:wikipedia.org")!)
     }
 }

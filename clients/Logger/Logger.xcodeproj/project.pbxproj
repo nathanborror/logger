@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D81896EE2492DE1100440DE0 /* LoggerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D81896ED2492DE1100440DE0 /* LoggerApp.swift */; };
-		D81896F22492DE1100440DE0 /* EntryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D81896F12492DE1100440DE0 /* EntryList.swift */; };
+		D81896F22492DE1100440DE0 /* ItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D81896F12492DE1100440DE0 /* ItemList.swift */; };
 		D81896F42492DE1200440DE0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D81896F32492DE1200440DE0 /* Assets.xcassets */; };
 		D81896F72492DE1200440DE0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D81896F62492DE1200440DE0 /* Preview Assets.xcassets */; };
 		D81896FA2492DE1200440DE0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D81896F82492DE1200440DE0 /* LaunchScreen.storyboard */; };
@@ -18,12 +18,13 @@
 		D85B7AA725C0EBC100A3B822 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85B7AA625C0EBC100A3B822 /* Extensions.swift */; };
 		D85F51D725DDD7ED00CA68F5 /* PartialSheet in Frameworks */ = {isa = PBXBuildFile; productRef = D85F51D625DDD7ED00CA68F5 /* PartialSheet */; };
 		D85F51DC25E06B5400CA68F5 /* LoggerKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D85F51DB25E06B5400CA68F5 /* LoggerKit.framework */; };
+		D8D2A07C25E2C1C500A467D6 /* ItemMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D2A07B25E2C1C500A467D6 /* ItemMenu.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		D81896EA2492DE1100440DE0 /* Logger.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Logger.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D81896ED2492DE1100440DE0 /* LoggerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerApp.swift; sourceTree = "<group>"; };
-		D81896F12492DE1100440DE0 /* EntryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryList.swift; sourceTree = "<group>"; };
+		D81896F12492DE1100440DE0 /* ItemList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemList.swift; sourceTree = "<group>"; };
 		D81896F32492DE1200440DE0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D81896F62492DE1200440DE0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		D81896F92492DE1200440DE0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -33,6 +34,7 @@
 		D81C476A25C5CE6B00B0DC43 /* ComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComposerView.swift; sourceTree = "<group>"; };
 		D85B7AA625C0EBC100A3B822 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		D85F51DB25E06B5400CA68F5 /* LoggerKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LoggerKit.framework; path = Frameworks/LoggerKit.framework; sourceTree = "<group>"; };
+		D8D2A07B25E2C1C500A467D6 /* ItemMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemMenu.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,7 +72,8 @@
 			children = (
 				D81896ED2492DE1100440DE0 /* LoggerApp.swift */,
 				D81C476325C39B6500B0DC43 /* LoggerStore.swift */,
-				D81896F12492DE1100440DE0 /* EntryList.swift */,
+				D81896F12492DE1100440DE0 /* ItemList.swift */,
+				D8D2A07B25E2C1C500A467D6 /* ItemMenu.swift */,
 				D81C476A25C5CE6B00B0DC43 /* ComposerView.swift */,
 				D81C476625C3A08B00B0DC43 /* ComposerExpandedView.swift */,
 				D85B7AA625C0EBC100A3B822 /* Extensions.swift */,
@@ -187,7 +190,8 @@
 				D81896EE2492DE1100440DE0 /* LoggerApp.swift in Sources */,
 				D81C476B25C5CE6B00B0DC43 /* ComposerView.swift in Sources */,
 				D85B7AA725C0EBC100A3B822 /* Extensions.swift in Sources */,
-				D81896F22492DE1100440DE0 /* EntryList.swift in Sources */,
+				D8D2A07C25E2C1C500A467D6 /* ItemMenu.swift in Sources */,
+				D81896F22492DE1100440DE0 /* ItemList.swift in Sources */,
 				D81C476425C39B6500B0DC43 /* LoggerStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
