@@ -33,7 +33,7 @@ struct ItemRow: View {
             .cornerRadius(22)
             .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .onTapGesture {
-                sheetManager.showPartialSheet({ print("dismiss") }) {
+                sheetManager.showPartialSheet({}) {
                     ItemMenu(text: item.text, color: item.color, colorChange: handleColor, actions: [
                         .action(title: "Google", icon: "magnifyingglass", action: handleGoogle),
                         .action(title: "Wikipedia", icon: "book", action: handleWikipedia),

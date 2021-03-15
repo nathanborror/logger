@@ -2,9 +2,8 @@ import SwiftUI
 import LoggerKit
 
 struct ItemMenu: View {
-    
     let text: String
-    let color: Int64
+    @State var color: Int64
     let colorChange: (Int64) -> Void
     let actions: [ItemAction]
     
@@ -24,12 +23,12 @@ struct ItemMenu: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
-                    ItemColorSwatch(color: "#00CDFF", selected: color == 2, action: { colorChange(2) })
-                    ItemColorSwatch(color: "#00DF95", selected: color == 3, action: { colorChange(3) })
-                    ItemColorSwatch(color: "#DF008E", selected: color == 4, action: { colorChange(4) })
-                    ItemColorSwatch(color: "#FF8B00", selected: color == 5, action: { colorChange(5) })
-                    ItemColorSwatch(color: "#E3E3E3", selected: color == 0, action: { colorChange(0) })
-                    ItemColorSwatch(color: "#000000", selected: color == 1, action: { colorChange(1) })
+                    ItemColorSwatch(color: "#00CDFF", selected: color == 2, action: { handleColor(2) })
+                    ItemColorSwatch(color: "#00DF95", selected: color == 3, action: { handleColor(3) })
+                    ItemColorSwatch(color: "#DF008E", selected: color == 4, action: { handleColor(4) })
+                    ItemColorSwatch(color: "#FF8B00", selected: color == 5, action: { handleColor(5) })
+                    ItemColorSwatch(color: "#E3E3E3", selected: color == 0, action: { handleColor(0) })
+                    ItemColorSwatch(color: "#000000", selected: color == 1, action: { handleColor(1) })
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 2)
@@ -37,6 +36,11 @@ struct ItemMenu: View {
             
             Spacer()
         }
+    }
+    
+    func handleColor(_ color: Int64) {
+        self.color = color
+        colorChange(color)
     }
 }
 
