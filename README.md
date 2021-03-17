@@ -23,7 +23,7 @@ To get things up an running _locally_ you'll need the latest version of [Go](htt
 
 ## Tasks
 
-- [ ] Remove experimental store
+- [x] Remove experimental store
 - [ ] Make hashtags tappable
 - [ ] Implement search
 - [ ] Make repository public
