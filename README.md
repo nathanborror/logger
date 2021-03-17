@@ -21,3 +21,10 @@ To get things up an running _locally_ you'll need the latest version of [Go](htt
     $ open clients/Logger/Logger.xcodeproj
     <Build & Run>
 
+## Tasks
+
+- [ ] Remove experimental store
+- [ ] Make hashtags tappable
+- [ ] Implement search
+- [ ] Make repository public
+- [ ] Ship update to App Store
