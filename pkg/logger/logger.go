@@ -2,8 +2,8 @@ package logger
 
 import (
 	"github.com/nathanborror/logger/pkg/state"
-	"github.com/nathanborror/logger/pkg/state/alpha"
 	"github.com/nathanborror/logger/pkg/state/beta"
+	"github.com/nathanborror/logger/pkg/state/production"
 )
 
 const version = "1.0"
@@ -13,7 +13,7 @@ type Stater state.Stater
 
 // New returns and implementation of the state interface.
 func New(kind, name string) Stater {
-	state.Register("alpha", alpha.New)
+	state.Register("production", production.New)
 	state.Register("beta", beta.New)
 	return state.NewStater(kind, name)
 }

@@ -31,8 +31,8 @@ class LoggerStore: ObservableObject {
         print("➤ Loading Database: \(file)")
         print("➤ Framework Version: \(LoggerVersion())")
         
-        self.entryBackend = LoggerNew("alpha", file.absoluteString)
 //        self.documentBackend = LoggerNew("beta", file.absoluteString)
+        self.entryBackend = LoggerNew("production", file.absoluteString)
         self.locationManager.requestWhenInUseAuthorization()
     }
     
