@@ -74,7 +74,7 @@ class LoggerStore: ObservableObject {
     }
     
     private func apply(entryResponse: LoggerEntryResponse) {
-        let items = entryResponse.entries.map { Item(id: $0.id, text: $0.text, color: $0.color) }
+        let items = entryResponse.entries.map { Item(id: $0.id, text: $0.text, color: $0.color, tags: $0.tags) }
         self.state = ItemState(items: items)
     }
 }
@@ -89,6 +89,7 @@ struct Item: Identifiable {
     let id: Int64
     let text: String
     let color: Int64
+    let tags: [Tag]
 }
 
 // MARK: - Backend Types
@@ -102,6 +103,7 @@ struct LoggerEntry: Decodable, Identifiable {
     let id: Int64
     let text: String
     let color: Int64
+    let tags: [Tag]
     let created: Int64
     let modified: Int64
 }
@@ -109,4 +111,11 @@ struct LoggerEntry: Decodable, Identifiable {
 struct LoggerError: Decodable {
     let code: String
     let message: String
+}
+
+struct Tag: Decodable, Identifiable {
+    let id: String
+    let namespace: String
+    let key: String
+    let value: String
 }

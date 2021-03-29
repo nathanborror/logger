@@ -73,7 +73,7 @@ struct TokenButton: View {
 
 // MARK: - Preview
 
-struct ComposerView_Previews: PreviewProvider {
+struct ComposerExpandedView_Previews: PreviewProvider {
     static var previews: some View {
         ComposerExpandedView()
             .previewLayout(.fixed(width: 375, height: 88))

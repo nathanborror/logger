@@ -15,9 +15,14 @@ struct LoggerApp: App {
                 .environmentObject(store)
                 .environmentObject(sheetManager)
                 .onOpenURL { url in
-                    let original = FileManager.document(named: "data.logger")
-                    FileManager.replace(at: original, with: url)
-                    store.reload()
+                    print(url)
+                    if url.absoluteString.hasPrefix("logger:tag=") {
+                        let tag = url.absoluteString.removePrefix("logger:tag=")
+                        NotificationCenter.default.post(name: .itemSearch, object: tag)
+                    }
+//                    let original = FileManager.document(named: "data.logger")
+//                    FileManager.replace(at: original, with: url)
+//                    store.reload()
                 }
         }
     }
@@ -39,6 +44,7 @@ struct ContentView: View {
         .addPartialSheet()
         .onReceive(NotificationCenter.default.publisher(for: .itemSave), perform: handleSave)
         .onReceive(NotificationCenter.default.publisher(for: .itemDelete), perform: handleDelete)
+        .onReceive(NotificationCenter.default.publisher(for: .itemSearch), perform: handleSearch)
         .onReceive(NotificationCenter.default.publisher(for: .itemSearchGoogle), perform: handleSearchGoogle)
         .onReceive(NotificationCenter.default.publisher(for: .itemSearchWikipedia), perform: handleSearchWikipedia)
     }
@@ -55,6 +61,11 @@ struct ContentView: View {
     func handleDelete(_ publisher: NotificationCenter.Publisher.Output) {
         guard let item = publisher.object as? Item else { return }
         store.itemDelete(id: item.id)
+    }
+    
+    func handleSearch(_ publisher: NotificationCenter.Publisher.Output) {
+        guard let query = publisher.object as? String else { return }
+        store.itemSearch(query: query)
     }
     
     func handleSearchGoogle(_ publisher: NotificationCenter.Publisher.Output) {

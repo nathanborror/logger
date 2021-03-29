@@ -22,7 +22,7 @@ struct ItemRow: View {
     @EnvironmentObject var sheetManager: PartialSheetManager
     
     let item: Item
-    
+     
     @State var confirmDelete = false
     
     var body: some View {
@@ -34,12 +34,15 @@ struct ItemRow: View {
             .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .onTapGesture {
                 sheetManager.showPartialSheet({}) {
-                    ItemMenu(text: item.text, color: item.color, colorChange: handleColor, actions: [
+                    ItemMenu(text: item.text, actions: [
+                        .divider,
+                        .tags(tags: item.tags, action: handleTag),
+                        .colorPicker(color: item.color, action: handleColor),
                         .action(title: "Google", icon: "magnifyingglass", action: handleGoogle),
                         .action(title: "Wikipedia", icon: "book", action: handleWikipedia),
                         .destructive(title: "Delete", icon: "trash", action: handleConfirmDelete),
                     ])
-                    .frame(height: 350)
+                    .frame(height: 400)
                 }
             }
             .alert(isPresented: $confirmDelete) {
@@ -69,7 +72,12 @@ struct ItemRow: View {
     }
     
     func handleColor(_ color: Int64) {
-        let updated = Item(id: item.id, text: item.text, color: color)
+        let updated = Item(id: item.id, text: item.text, color: color, tags: [])
         NotificationCenter.default.post(name: .itemSave, object: updated)
+    }
+    
+    func handleTag(_ tag: Tag) {
+        guard let url = URL(string: "logger:tag=\(tag.id)") else { return }
+        UIApplication.shared.open(url)
     }
 }

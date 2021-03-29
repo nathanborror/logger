@@ -1,12 +1,15 @@
 import Foundation
 import SwiftUI
 import LoggerKit
+import CoreLocation
+import Combine
 
 // MARK: - Notifications
 
 extension Notification.Name {
     static let itemSave = Notification.Name("ItemSaveNotification")
     static let itemDelete = Notification.Name("ItemDeleteNotification")
+    static let itemSearch = Notification.Name("ItemSearchNotification")
     static let itemSearchGoogle = Notification.Name("ItemSearchGoogleNotification")
     static let itemSearchWikipedia = Notification.Name("ItemSearchWikipediaNotification")
 }
@@ -59,6 +62,16 @@ struct FlippedUpsideDown: ViewModifier {
 extension View {
     func flipUpsideDown() -> some View {
         self.modifier(FlippedUpsideDown())
+    }
+}
+
+// MARK: - String
+
+extension String {
+
+    func removePrefix(_ prefix: String) -> String {
+        guard self.hasPrefix(prefix) else { return self }
+        return String(self.dropFirst(prefix.count))
     }
 }
 
@@ -172,4 +185,55 @@ extension Formatter {
     }()
 
     public static let iso8601noFS = ISO8601DateFormatter()
+}
+
+// MARK: - CoreLocation
+
+extension CLLocationManager {
+    
+    static func publishLocation() -> LocationPublisher {
+        return .init()
+    }
+    
+    struct LocationPublisher: Publisher {
+        typealias Output = CLLocation
+        typealias Failure = Never
+        
+        func receive<S>(subscriber: S) where S : Subscriber, Self.Failure == S.Failure, Self.Output == S.Input {
+            let subscription = LocationSubscription(subscriber: subscriber)
+            subscriber.receive(subscription: subscription)
+        }
+        
+        final class LocationSubscription<S: Subscriber>: NSObject, CLLocationManagerDelegate, Subscription where S.Input == Output, S.Failure == Failure {
+            var subscriber: S
+            var locationManager = CLLocationManager()
+            
+            init(subscriber: S) {
+                self.subscriber = subscriber
+                super.init()
+                locationManager.delegate = self
+            }
+            
+            func request(_ demand: Subscribers.Demand) {
+                locationManager.startUpdatingLocation()
+                locationManager.requestWhenInUseAuthorization()
+            }
+            
+            func cancel() {
+                locationManager.stopUpdatingLocation()
+            }
+            
+            func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+                for location in locations {
+                    _ = subscriber.receive(location)
+                }
+            }
+        }
+    }
+}
+
+extension CLLocation {
+    func placemark(completion: @escaping (CLPlacemark?, Error?) -> Void) {
+        CLGeocoder().reverseGeocodeLocation(self) { completion($0?.first, $1) }
+    }
 }
