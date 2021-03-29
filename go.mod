@@ -1,4 +1,4 @@
-module github.com/nathanborror/logger/pkg/logger
+module github.com/nathanborror/logger
 
 go 1.16
 
