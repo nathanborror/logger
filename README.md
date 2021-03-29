@@ -1,10 +1,10 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-[![image](https://github.com/nathanborror/logger/blob/master/static/2021-03-29%20Logger.png?raw=true)](https://github.com/nathanborror/logger/blob/master/static/2021-03-29%20Logger%20Spread.png?raw=true)
-
 # Logger
 
 Logger lets you quickly send messages to yourself as a means of fast note taking. All messages you send to yourself show up chronologically. Tapping the spacebar before entering any text puts you in a search mode for easy filtering. Hashtags can be used to categorize notes. All data is stored on your device and not shared with the cloud.
+
+[![image](https://github.com/nathanborror/logger/blob/master/static/2021-03-29%20Logger.png?raw=true)](https://github.com/nathanborror/logger/blob/master/static/2021-03-29%20Logger%20Spread.png?raw=true)
 
 ## Usage
 
