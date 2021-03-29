@@ -1,4 +1,4 @@
-[![image](https://github.com/nathanborror/logger/blob/master/static/2021-02-19%20Logger.png?raw=true)](https://github.com/nathanborror/logger/blob/master/static/2021-02-19%20Logger%20Spread.png?raw=true)
+[![image](https://github.com/nathanborror/logger/blob/master/static/2021-03-29%20Logger.png?raw=true)](https://github.com/nathanborror/logger/blob/master/static/2021-03-29%20Logger%20Spread.png?raw=true)
 
 # Logger
 
