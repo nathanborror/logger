@@ -16,15 +16,19 @@ To get things up an running _locally_ you'll need the latest version of [Go](htt
     $ make test
     $ make
 
-2: Build xcode project:
+2: Build Xcode project:
 
     $ open clients/Logger/Logger.xcodeproj
     <Build & Run>
 
 ## Tasks
 
-- [x] Remove experimental store
-- [ ] Make hashtags tappable
-- [ ] Implement search
+- [x] Remove experimental state backend
+- [x] Make hashtags tappable (moved to popover until I can devise a cleaner solution)
+- [x] Implement search
 - [ ] Make repository public
 - [ ] Ship update to App Store
+
+## Notes
+
+- Go mobile doesn't appear to support modules which explains the `GO111MODULE=off` environment variable in the make command (ref: https://github.com/golang/go/issues/27234).
