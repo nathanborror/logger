@@ -3,6 +3,8 @@ package production
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -18,14 +20,28 @@ type entry struct {
 	ID       int64  `json:"id" db:"id"`
 	Text     string `json:"text" db:"text"`
 	Color    int64  `json:"color" db:"color"`
+	Tags     []tag  `json:"tags" db:"-"`
 	Created  int64  `json:"created" db:"created"`
 	Modified int64  `json:"modified" db:"modified"`
+}
+
+// example tags: #value, #namespace:key, #namespace:key=value, #key=value
+type tag struct {
+	ID        string `json:"id"`
+	Namespace string `json:"namespace"`
+	Key       string `json:"key"`
+	Value     string `json:"value"`
 }
 
 type snapshot struct {
 	Entries []entry `json:"entries"`
 	Error   *Error  `json:"error"`
 }
+
+var (
+	reHashTag = regexp.MustCompile(`\B#\w[\w-:=,.]+`)
+	reSpaces  = regexp.MustCompile(`\s\s+`)
+)
 
 // New sets up a new database if one doesn't already exist.
 func New(name string) state.Stater {
@@ -102,14 +118,19 @@ func (m *manager) EntrySearch(query string) []byte {
 		ids     []int
 		entries []entry
 	)
+	if query == "" {
+		return m.Current()
+	}
 	if err := m.db.Select(&ids, `SELECT rowid FROM entry_index WHERE entry_index MATCH 'text:`+query+` * '`); err != nil {
 		return encodeError(ErrorProgrammerFailure("failed to query entries: %s", err.Error()))
 	}
-	query, args, err := sqlx.In(`SELECT * FROM entry WHERE id IN (?)`, ids)
+	query, args, err := sqlx.In(`SELECT * FROM entry WHERE id IN (?) ORDER BY created DESC`, ids)
 	if err != nil {
 		return encodeError(ErrorProgrammerFailure("failed to get matched entries: %s", err.Error()))
 	}
-	err = m.db.Select(&entries, m.db.Rebind(query), args...)
+	if err = m.db.Select(&entries, m.db.Rebind(query), args...); err != nil {
+		return encodeError(ErrorProgrammerFailure("failed to get entries: %s", err.Error()))
+	}
 	return encodeEntries(entries)
 }
 
@@ -161,11 +182,51 @@ func encodeResponse(s snapshot) []byte {
 }
 
 func encodeEntries(entries []entry) []byte {
+	if entries == nil {
+		entries = []entry{}
+	}
+	for i, entry := range entries {
+		entries[i].Tags = encodeEntryTags(entry.Text)
+		entries[i].Text = encodeEntryText(entry.Text)
+	}
 	return encodeResponse(snapshot{Entries: entries})
+}
+
+func encodeEntryTags(text string) []tag {
+	strs := reHashTag.FindAllString(text, -1)
+	tags := []tag{}
+	for _, str := range strs {
+		tags = append(tags, encodeTag(str))
+	}
+	return tags
+}
+
+func encodeTag(str string) tag {
+	id := strings.TrimPrefix(str, "#")
+
+	splitter := func(str string, char string) (string, string) {
+		parts := strings.Split(str, char)
+		if len(parts) == 2 {
+			return parts[0], parts[1]
+		}
+		return "", str
+	}
+	namespace, value := splitter(id, ":")
+	key, value := splitter(value, "=")
+	tag := tag{ID: id, Namespace: namespace, Key: key, Value: value}
+	return tag
+}
+
+func encodeEntryText(text string) string {
+	cleaned := reHashTag.ReplaceAllString(text, " ")
+	cleaned = reSpaces.ReplaceAllString(cleaned, " ")
+	cleaned = strings.TrimSpace(cleaned)
+	return cleaned
 }
 
 func encodeError(err error) []byte {
 	s := snapshot{}
+	s.Entries = []entry{}
 	switch v := err.(type) {
 	case Error:
 		s.Error = &v
