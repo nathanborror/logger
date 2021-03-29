@@ -28,7 +28,7 @@ To get things up an running _locally_ you'll need the latest version of [Go](htt
 - [x] Remove experimental state backend
 - [x] Make hashtags tappable (moved to popover until I can devise a cleaner solution)
 - [x] Implement search
-- [ ] Make repository public
+- [x] Make repository public
 - [ ] Ship update to App Store
 
 ## Notes
